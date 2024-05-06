@@ -24,6 +24,7 @@ DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
 eventHoe=false  # Set to `true` if "Heroes of Esperia" event is live
 eventTs=false   # Set to `true` if "Treasure Scramble" event is live
+eventThc=true   # Set to `true` if "Treasure Hunt Camp" event is live
 totalAmountOakRewards=3
 
 # Do not modify
@@ -66,6 +67,7 @@ while getopts "ce:fgi:l:s:tv:w" opt; do
             case "$i" in
             "hoe") eventHoe=true ;; # Heroes of Esperia
             "ts") eventTs=true ;;   # Treasure Scramble (same problem as HoE atm)
+            "thc") eventThc=true ;;   # Treasure Hunt Camp (same problem as HoE atm)
             esac
         done
         IFS=$buIFS
@@ -606,7 +608,7 @@ waitBattleFinish() {
         if testColorOR -f 560 350 b8894d b7894c; then # Victory
             battleFailed=false
             finished=true
-        elif [ "$HEX" = '171932' ] || [ "$HEX" = "171d3c" ]; then # Failed & Failed in Challenger Tournament
+        elif [ "$HEX" = '171932' ] || [ "$HEX" = "171b36" ]; then # Failed & Failed in Challenger Tournament
             battleFailed=true
             finished=true
         # First HEX local device, second bluestacks
@@ -714,7 +716,7 @@ challengeBoss() {
         testColorORTapSleep 715 1260 fefffe # Check for confirm to exit button
     else
         # Quick exit battle
-        inputTapSleep 550 1850 1 # Battle
+        inputTapSleep 550 1850 3 # Battle
         inputTapSleep 80 1460    # Pause
         inputTapSleep 230 960 1  # Exit
 
@@ -741,7 +743,7 @@ collectFriendsAndMercenaries() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectFriendsAndMercenaries" >&2; fi
     inputTapSleep 970 810 1                                  # Friends
     inputTapSleep 930 1600                                   # Send & Recieve
-    if testColorOR -d "$DEFAULT_DELTA" 825 1750 df1909; then # Check if its necessary to send mercenaries
+    if testColorOR -d "$DEFAULT_DELTA" 825 1750 e21a07; then # Check if its necessary to send mercenaries
         inputTapSleep 720 1760                               # Short-Term
         inputTapSleep 990 190                                # Manage
         inputTapSleep 630 1590                               # Apply
@@ -762,7 +764,7 @@ collectFriendsAndMercenaries() {
 # ##############################################################################
 fastRewards() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fastRewards" >&2; fi
-    if testColorOR -d "$DEFAULT_DELTA" 980 1620 ef1e05; then # check red dot to see if free fast reward is avaible
+    if testColorOR -d "$DEFAULT_DELTA" 980 1620 ed1f06; then # check red dot to see if free fast reward is avaible
         inputTapSleep 950 1660 1
         inputTapSleep 710 1260
         inputTapSleep 560 1800 1
@@ -797,7 +799,7 @@ lootAfkChest() {
 arenaOfHeroes() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes" >&2; fi
     inputTapSleep 740 1050 3
-    if [ "$eventHoe" = false ] && [ "$eventTs" = false ]; then
+    if [ "$eventHoe" = false ] && [ "$eventTs" = false ] && [ "$eventThc" = false ]; then
         inputTapSleep 550 450 3
     else
         inputTapSleep 550 900 3
@@ -833,14 +835,14 @@ arenaOfHeroes() {
                 fi
                 ;;
             2)
-                if testColorOR -d "$DEFAULT_DELTA" 820 870 2daab4 aff3c0; then # Check if opponent exists
+                if testColorOR -d "$DEFAULT_DELTA" 820 870 2eaab4 aff3c0; then # Check if opponent exists
                     inputTapSleep 820 870 0                                    # Fight opponent
                 else
                     arenaOfHeroes_tapClosestOpponent 2 # Try to fight the closest opponent to 2
                 fi
                 ;;
             3)
-                if testColorOR -d "$DEFAULT_DELTA" 820 1050 a7f1b7; then # Check if opponent exists
+                if testColorOR -d "$DEFAULT_DELTA" 820 1050 adf1bf; then # Check if opponent exists
                     inputTapSleep 820 1050 0                             # Fight opponent
                 else
                     arenaOfHeroes_tapClosestOpponent 3 # Try to fight the closest opponent to 3
@@ -854,7 +856,7 @@ arenaOfHeroes() {
                 fi
                 ;;
             5)
-                if testColorOR -d "$DEFAULT_DELTA" 820 1400 aaf2bb; then # Check if opponent exists
+                if testColorOR -d "$DEFAULT_DELTA" 820 1400 aff1bf; then # Check if opponent exists
                     inputTapSleep 820 1400 0                             # Fight opponent
                 else
                     arenaOfHeroes_tapClosestOpponent 5 # Try to fight the closest opponent to 5
@@ -871,7 +873,7 @@ arenaOfHeroes() {
             res=$?
             if [ $res = 0 ]; then
                 wait
-                if testColorOR -d "$DEFAULT_DELTA" 20 1200 eaca95; then
+                if testColorOR -d "$DEFAULT_DELTA" 20 1200 e6c58f; then
                     inputTapSleep 550 1850 0 # Battle
                     waitBattleStart
                     doSkip
@@ -935,19 +937,19 @@ arenaOfHeroes_tapClosestOpponent() {
             ;;
         2)
             # Check if opponent 2 exists and fight if true
-            if testColorOR -d "$DEFAULT_DELTA" 820 870 2daab4 aff3c0; then inputTapSleep 820 870 0; else return 1; fi
+            if testColorOR -d "$DEFAULT_DELTA" 820 870 2eaab4; then inputTapSleep 820 870 0; else return 1; fi
             ;;
         3)
             # Check if opponent 3 exists and fight if true
-            if testColorOR -d "$DEFAULT_DELTA" 820 1050 a7f1b7; then inputTapSleep 820 1050 0; else return 1; fi
+            if testColorOR -d "$DEFAULT_DELTA" 820 1050 adf1bf; then inputTapSleep 820 1050 0; else return 1; fi
             ;;
         4)
             # Check if opponent 4 exists and fight if true
-            if testColorOR -d "$DEFAULT_DELTA" 820 1220 2daab4 aff3c0; then inputTapSleep 820 1220 0; else return 1; fi
+            if testColorOR -d "$DEFAULT_DELTA" 820 1220 2daab4; then inputTapSleep 820 1220 0; else return 1; fi
             ;;
         5)
             # Check if opponent 5 exists and fight if true
-            if testColorOR -d "$DEFAULT_DELTA" 820 1400 aaf2bb; then inputTapSleep 820 1400 0; else return 1; fi
+            if testColorOR -d "$DEFAULT_DELTA" 820 1400 aff1bf; then inputTapSleep 820 1400 0; else return 1; fi
             ;;
         esac
         ;;
@@ -959,21 +961,21 @@ arenaOfHeroes_tapClosestOpponent() {
         fi
         ;;
     3)
-        if testColorOR -d "$DEFAULT_DELTA" 820 870 2daab4 aff3c0; then # Check if opponent 2 exists
+        if testColorOR -d "$DEFAULT_DELTA" 820 870 2eaab4; then # Check if opponent 2 exists
             inputTapSleep 820 870 0                                    # Fight opponent
         else
             arenaOfHeroes_tapClosestOpponent 2 # Try to fight the closest opponent to 3
         fi
         ;;
     4)
-        if testColorOR -d "$DEFAULT_DELTA" 820 1050 a7f1b7; then # Check if opponent 3 exists
+        if testColorOR -d "$DEFAULT_DELTA" 820 1050 adf1bf; then # Check if opponent 3 exists
             inputTapSleep 820 1050 0                             # Fight opponent
         else
             arenaOfHeroes_tapClosestOpponent 3 # Try to fight the closest opponent to 4
         fi
         ;;
     5)
-        if testColorOR -d "$DEFAULT_DELTA" 820 1220 2daab4 aff3c0; then # Check if opponent 4 exists
+        if testColorOR -d "$DEFAULT_DELTA" 820 1220 2daab4; then # Check if opponent 4 exists
             inputTapSleep 820 1220 0                                    # Fight opponent
         else
             arenaOfHeroes_tapClosestOpponent 4 # Try to fight the closest opponent to 5
@@ -988,10 +990,10 @@ arenaOfHeroes_tapClosestOpponent() {
 # ##############################################################################
 kingsTower() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "kingsTower" >&2; fi
-    inputTapSleep 500 870 5 # King's Tower
+    inputTapSleep 550 850 5 # King's Tower
     printInColor "INFO" "Fighting King's Tower until ${cCyan}$maxKingsTowerFights${cNc} defeat(s)."
 
-    if testColorOR 550 150 1a1212; then
+    if testColorOR 550 140 1a1212; then
         # King's Tower without Towers of Esperia unlocked (between stage 2-12 and 15-1)
         if [ "$doMainTower" = true ]; then
             printInColor "DONE" "Main Tower $(kingsTower_battle -1 -1)" # Main Tower
@@ -1048,12 +1050,15 @@ kingsTower_battle() {
     fi
 
     # Check if inside tower
-    if testColorOR 550 150 1a1212; then
+    if testColorOR 550 140 1a1212; then
         inputTapSleep 540 1350 # Challenge
 
         # Battle until equal to maxKingsTowerFights & we haven't reached daily limit of 10 floors
-        until [ "$_kingsTower_battle_COUNT" -ge "$maxKingsTowerFights" ] || testColorOR -f 550 150 1a1212; do
+        until [ "$_kingsTower_battle_COUNT" -ge "$maxKingsTowerFights" ] || testColorOR -f 550 140 1a1212; do
             inputTapSleep 550 1850 0 # Battle
+            waitBattleStart
+            doAuto
+            doSpeed
             waitBattleFinish 2
 
             # Check if win or lose battle
@@ -1064,9 +1069,9 @@ kingsTower_battle() {
 
                 # WARN: Limited offers might screw this up. Tapping 550 170 might close an offer.
                 # Tap top of the screen to close any possible Limited Offers
-                # if testColorOR 550 150 1a1212; then # not on screen with Challenge button
+                # if testColorOR 550 140 1a1212; then # not on screen with Challenge button
                 #     inputTapSleep 550 75        # Tap top of the screen to close Limited Offer
-                #     if testColorOR 550 150 1a1212; then # think i remember it needs two taps to close offer
+                #     if testColorOR 550 140 1a1212; then # think i remember it needs two taps to close offer
                 #         inputTapSleep 550 75    # Tap top of the screen to close Limited Offer
                 # fi
 
@@ -1082,7 +1087,7 @@ kingsTower_battle() {
         # Return from chosen tower / battle
         inputTapSleep 70 1810 3
         if [ "$1" -ge 0 ] && [ "$2" -ge 0 ]; then # Will be -1 if we already are in the tower (low level)
-            if testColorOR 550 150 1a1212; then   # In case still in tower, exit once more
+            if testColorOR 550 140 1a1212; then   # In case still in tower, exit once more
                 inputTapSleep 70 1810 0
             fi
         fi
@@ -1104,7 +1109,7 @@ legendsTournament() {
     ## For testing only! Keep as comment ##
     # inputTapSleep 740 1050 1
     ## End of testing ##
-    if [ "$eventHoe" = false ] && [ "$eventTs" = false ]; then
+    if [ "$eventHoe" = false ] && [ "$eventTs" = false ] && [ "$eventThc" = false ]; then
         inputTapSleep 550 900 # Legend's Challenger Tournament
     else
         inputTapSleep 550 1450 # Legend's Challenger Tournament
@@ -1112,7 +1117,7 @@ legendsTournament() {
     inputTapSleep 550 280 3  # Chest
     inputTapSleep 550 1550 3 # Collect
 
-    if testColorOR -d "$DEFAULT_DELTA" 1040 1800 e72007; then # Red mark?
+    if testColorOR -d "$DEFAULT_DELTA" 1040 1800 e61f06; then # Red mark?
         inputTapSleep 1000 1800                               # Record
         inputTapSleep 990 380                                 # Close
     fi
@@ -1124,7 +1129,7 @@ legendsTournament() {
         inputTapSleep 550 1840 4                      # Challenge
         inputTapSleep 800 1140 4                      # Third opponent
 
-        if testColorOR -d "$DEFAULT_DELTA" 20 1200 eaca95; then
+        if testColorOR -d "$DEFAULT_DELTA" 20 1200 e6c58f; then
             inputTapSleep 550 1850 4 # Begin Battle
             # inputTapSleep 770 1470 4
             waitBattleStart
@@ -1156,7 +1161,8 @@ legendsTournament() {
 # ##############################################################################
 soloBounties() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "soloBounties" >&2; fi
-    inputTapSleep 600 1320 1
+    inputTapSleep 600 1320 2
+    inputTapSleep 650 1700 1 # Solo Bounty
     inputTapSleep 780 1550 1 # Collect all
     inputTapSleep 350 1550   # Dispatch all
     inputTapSleep 550 1500 0 # Confirm
@@ -1184,11 +1190,11 @@ teamBounties() {
     ## For testing only! Keep as comment ##
     # inputTapSleep 600 1320 1
     ## End of testing ##
-    inputTapSleep 910 1770
+    inputTapSleep 910 1700 1 # Team Bounty
     inputTapSleep 780 1550 1 # Collect all
     inputTapSleep 350 1550   # Dispatch all
     inputTapSleep 550 1500   # Confirm
-    inputTapSleep 70 1810
+    inputTapSleep 70 1810    # Return
     verifyHEX 240 1775 d49a61 "Collected/dispatched team bounties." "Failed to collect/dispatch team bounties."
 }
 
@@ -1202,7 +1208,7 @@ teamBounties() {
 # ##############################################################################
 buyFromStore() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "buyFromStore" >&2; fi
-    inputTapSleep 330 1650 3
+    inputTapSleep 330 1750 3 # Store
 
     if [ "$buyStoreDust" = true ]; then # Dust
         buyFromStore_buyItem 175 1100
@@ -1379,7 +1385,7 @@ buyFromStore_test() {
 # ##############################################################################
 guildHunts() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "guildHunts" >&2; fi
-    inputTapSleep 380 360 10
+    inputTapSleep 300 600 10      # Guild
 
     # Check for fortune chest
     if testColorOR 380 500 8e4633; then
@@ -1388,7 +1394,7 @@ guildHunts() {
     fi
     wait
 
-    inputTapSleep 290 860 3
+    inputTapSleep 290 860 3       # Guild Hunting
     printInColor "INFO" "Fighting Wrizz ${cCyan}$totalAmountGuildBossTries${cNc} time(s)."
     guildHunts_quickBattle
     inputTapSleep 970 890 1              # Soren
@@ -1456,7 +1462,7 @@ nobleTavern() {
     inputTapSleep 400 1820 1 # The noble tavern again
 
     #until testColorOR 890 850 f4e38e; do       # Looking for heart
-    until testColorOR -d "$DEFAULT_DELTA" 875 835 f39067; do # Looking for heart, old value: fc9473 (d=4)
+    until testColorOR -d "$DEFAULT_DELTA" 875 835 f88c6b; do # Looking for heart, old value: f39067 (d=4)
         inputTapSleep 870 1630 1                             # Next pannel
     done
 
@@ -1476,7 +1482,7 @@ nobleTavern() {
 # ##############################################################################
 oakInn() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "oakInn" >&2; fi
-    inputTapSleep 670 320 5 # Oak Inn
+    inputTapSleep 500 200 5 # Oak Inn
     printInColor "INFO" "Searching for presents to collect..."
 
     _oakInn_TRIES=0
@@ -1574,19 +1580,19 @@ templeOfAscension() {
 twistedRealmBoss() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "twistedRealmBoss ${cPurple}$*${cNc}" >&2; fi
     if [ "$1" = true ]; then # Check if starting from tab or already inside activity
-        inputTapSleep 380 360 10
+        inputTapSleep 300 600 10      # Guild
     fi
     ## For testing only! Keep as comment ##
     # inputTapSleep 380 360 10
     ## End of testing ##
 
-    inputTapSleep 820 820 2 # Twisted Realm
+    inputTapSleep 820 820 2 # Hellscape
 
     if testColorOR 540 1220 9aedc1; then # Check if TR is being calculated
         printInColor "INFO" "Unable to fight in the Twisted Realm because it's being calculated." >&2
     else
-        # Check for cursed realm screen
-        if testColorOR 750 100 1e2e3f; then
+        # Check for Hellscape screen
+        if testColorOR 750 100 1c2d3e; then
             inputTapSleep 550 700 2 # Twisted Realm
         fi
 
@@ -1656,7 +1662,7 @@ checkWhereToEnd() {
     "championship")
         switchTab "Dark Forest" true
         inputTapSleep 740 1050
-        if [ "$eventHoe" = false ] && [ "$eventTs" = false ]; then
+        if [ "$eventHoe" = false ] && [ "$eventTs" = false ] && [ "$eventThc" = false ]; then
             inputTapSleep 550 1370 0
         else
             inputTapSleep 550 1680 0
@@ -1738,9 +1744,9 @@ collectQuestChests_quick() {
 collectMail() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectMail" >&2; fi
     # WARN: May break because "some resources have exceeded their maximum limit"
-    if testColorOR -d "$DEFAULT_DELTA" 1011 569 fd2b1a; then # Red mark
-        inputTapSleep 960 630                                # Mail
-        inputTapSleep 790 1470                               # Collect all
+    if testColorOR -d "$DEFAULT_DELTA" 1011 606 fe2b16; then # Red mark
+        inputTapSleep 960 650                                # Mail
+        inputTapSleep 790 1570                               # Collect all
         inputTapSleep 110 1850                               # Return
         inputTapSleep 110 1850                               # Return
         verifyHEX 20 1775 d49a61 "Collected Mail." "Failed to collect Mail."
@@ -1761,7 +1767,7 @@ collectMerchants() {
     inputTapSleep 780 1820 2 # Merchant Ship
 
     # Check for "Specials" freebie
-    if testColorOR -d "$DEFAULT_DELTA" 365 740 d10000; then
+    if testColorOR -d "$DEFAULT_DELTA" 365 740 ce0101; then
         inputTapSleep 210 945 1 # Free
         inputTapSleep 550 300 1 # Collect rewards
     else
@@ -1769,12 +1775,12 @@ collectMerchants() {
     fi
 
     # Check for "Daily Deals" freebie
-    if testColorOR -d "$DEFAULT_DELTA" 425 1524 fe4938; then
+    if testColorOR -d "$DEFAULT_DELTA" 345 1521 fe2108; then
         inputTapSleep 280 1625 1
         if testColorOR -d "$DEFAULT_DELTA" 365 515 d20101; then
             inputTapSleep 210 720 1 # Free
             inputTapSleep 550 300 1 # Collect rewards
-        elif testColorOR -d "$DEFAULT_DELTA" 365 1000 cd0000; then
+        elif testColorOR -d "$DEFAULT_DELTA" 365 1000 cc0101; then
             inputTapSleep 210 1200 1 # Free
             inputTapSleep 550 300 1  # Collect rewards
         else
@@ -1785,7 +1791,7 @@ collectMerchants() {
     fi
 
     # Check for "Biweeklies" freebie
-    if testColorOR -d "$DEFAULT_DELTA" 590 1524 ff1e0d; then
+    if testColorOR -d "$DEFAULT_DELTA" 520 1521 ff2209; then
         inputTapSleep 455 1625 1
         if testColorOR -d "$DEFAULT_DELTA" 365 515 d20101; then
             inputTapSleep 210 720 1 # Free
@@ -1907,7 +1913,7 @@ init() {
     sleep 1
 
     # Open menu for friends, etc
-    inputTapSleep 970 380 0
+    inputTapSleep 970 430 0
 
     if testColorOR -f 740 205 ffc359; then # Check if game is being updated
         printInColor "INFO" "Game is being updated!" >&2
@@ -1985,6 +1991,7 @@ if [ "$testServer" = true ]; then printInColor "INFO" "Test server: ${cBlue}ON${
 # Events
 if [ "$eventHoe" = true ]; then activeEvents="${activeEvents}| Heroes of Esperia |"; fi
 if [ "$eventTs" = true ]; then activeEvents="${activeEvents}| Treasure Scramble |"; fi
+if [ "$eventThc" = true ]; then activeEvents="${activeEvents}| Treasure Hunt Camp |"; fi
 if [ -n "$activeEvents" ]; then printInColor "INFO" "Active event(s): ${cBlue}${activeEvents}${cNc}"; fi
 
 echo
