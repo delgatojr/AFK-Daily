@@ -2,10 +2,10 @@
 # ##############################################################################
 # Script Name   : deploy.sh
 # Description   : Used to run afk-daily on phone
-# Args          : [-h, --help] [-a, --account [ACCOUNT]] [-c, --check]
-#                 [-d, --device [DEVICE]] [-e, --event [EVENT]] [-f, --fight]
-#                 [-i, --ini [SUB]] [-n] [-o, --output [OUTPUT_FILE]]
-#                 [-p, --port [PORT]] [-r]
+# Args          : [-h, --help] [-a, --account [ACCOUNT]] [-b, -battle] 
+#                 [-c, --check] [-d, --device [DEVICE]] [-e, --event [EVENT]] 
+#                 [-f, --fight] [-i, --ini [SUB]] [-n] 
+#                 [-o, --output [OUTPUT_FILE]] [-p, --port [PORT]] [-r]
 #                 [-s <X>,<Y>[,<COLOR_TO_COMPARE>[,<REPEAT>[,<SLEEP>]]]]
 #                 [-t, --test] [-v, --verbose [DEBUG]] [-w, --weekly]
 # GitHub        : https://github.com/zebscripts/AFK-Daily

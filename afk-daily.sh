@@ -1811,6 +1811,153 @@ collectMerchants() {
 }
 
 # ##############################################################################
+# Function Name : pushCampaign
+# Descripton    : Pushes campaign using popular formations
+# Remark        : Breaks on boss battles (every 4 fights).
+# ##############################################################################
+pushCampaign(){
+    # if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushCampaign" >&2; fi
+    # inputTapSleep 550 1650 3            # Begin
+    # if testColorOR 550 740 f2d79f; then # Check if boss
+    #     inputTapSleep 550 1450 3        # Begin
+    # fi
+    
+    while [ true ]; do
+        _formation=1
+        _challengeBoss_LOOSE=0
+        _challengeBoss_WIN=0
+        until [ "$_formation" -ge 6 ] || [ "$_challengeBoss_WIN" -ge 1 ]; do
+            chooseFormation "$_formation"
+            until [ "$_challengeBoss_LOOSE" -ge 5 ] || [ "$_challengeBoss_WIN" -ge 1 ]; do
+                inputTapSleep 550 1850 .5 # Battle
+                waitBattleStart
+                doAuto
+                doSpeed
+                waitBattleFinish 5 # Wait until battle is over
+                # Check battle result
+                if [ "$battleFailed" = false ]; then     # Win
+                    echo "${cGreen}WIN${cNc}"
+                    _formation=1
+                    _challengeBoss_WIN=$((_challengeBoss_WIN + 1)) # Increment
+                    if testColorOR 550 1670 e2dddc; then # Check for next stage
+                        inputTapSleep 550 1670 6         # Next Stage
+                        sleep 6
+
+                        # WARN: Limited offers will fuck this part of the script up. I'm yet to find a way to close any possible offers.
+                        # Tap top of the screen to close any possible Limited Offers
+                        # inputTapSleep 550 75
+                        
+                        if testColorOR 550 740 f2d79f; then # Check if boss
+                            inputTapSleep 550 1450 6
+                        fi
+                    else
+                        inputTapSleep 550 1670 3 # Continue to next battle
+
+                        if testColorNAND -d "$DEFAULT_DELTA" -f 200 1850 2b1a12; then # For low levels, does not exists (before stage 4)
+                            inputTapSleep 550 1650 3                                  # Begin
+                            if testColorOR 550 740 f2d79f; then                       # Check if boss
+                                inputTapSleep 550 1450 3                              # Begin
+                            fi
+                        fi
+                    fi
+                else                                               # Loose
+                    echo "${cRed}Loss${cNc}"
+                    _challengeBoss_LOOSE=$((_challengeBoss_LOOSE + 1)) # Increment
+                    inputTapSleep 550 1720 5                       # Try again
+                    if testColorNAND -d "$DEFAULT_DELTA" -f 200 1850 2b1a12; then # For low levels, does not exists (before stage 4)
+                        inputTapSleep 550 1650 3                                  # Begin
+                        if testColorOR 550 740 f2d79f; then                       # Check if boss
+                            inputTapSleep 550 1450 3                              # Begin
+                        fi
+                    fi
+                fi
+            done
+            _formation=$((_formation + 1)) # Increment
+            _challengeBoss_LOOSE=0
+        done
+    done
+}
+
+# ##############################################################################
+# Function Name : pushKingsTower
+# Descripton    : Pushes campaign using popular formations
+# Remark        : Loops until you manually exit script
+# ##############################################################################
+pushKingsTower(){
+    while [ true ]; do
+        _formation=1
+        _kingsTower_battle_COUNT=0 # Equivalent to loose
+        _kingsTower_battle_WIN=0
+        until [ "$_formation" -ge 6 ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
+            chooseFormation "$_formation"
+            until [ "$_kingsTower_battle_COUNT" -ge 5 ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
+                inputTapSleep 550 1850 0 # Battle
+                waitBattleStart
+                doAuto
+                doSpeed
+                waitBattleFinish 2
+                # Check if win or lose battle
+                if [ "$battleFailed" = false ]; then
+                    echo "${cGreen}WIN${cNc}"
+                    _kingsTower_battle_WIN=$((_kingsTower_battle_WIN + 1)) # Increment
+                    inputTapSleep 550 1850 4                               # Collect
+                    inputTapSleep 550 170                                  # Tap on the top to close possible limited offer
+
+                    # WARN: Limited offers might screw this up. Tapping 550 170 might close an offer.
+                    # Tap top of the screen to close any possible Limited Offers
+                    # if testColorOR 550 140 1a1212; then # not on screen with Challenge button
+                    #     inputTapSleep 550 75        # Tap top of the screen to close Limited Offer
+                    #     if testColorOR 550 140 1a1212; then # think i remember it needs two taps to close offer
+                    #         inputTapSleep 550 75    # Tap top of the screen to close Limited Offer
+                    # fi
+
+                    inputTapSleep 540 1350 # Challenge
+                elif [ "$battleFailed" = true ]; then
+                    echo "${cRed}Loss${cNc}"
+                    inputTapSleep 550 1720                                     # Try again
+                    _kingsTower_battle_COUNT=$((_kingsTower_battle_COUNT + 1)) # Increment
+                fi
+            done
+            _formation=$((_formation + 1)) # Increment
+            _kingsTower_battle_COUNT=0
+        done
+    done
+}
+
+
+# ##############################################################################
+# Function Name : chooseFormation
+# Descripton    : Chooses a popular formation
+# Args          : <FORMATION_#>
+# ##############################################################################
+chooseFormation(){
+    echo "Choosing Formation $1"
+    case "$1" in
+    "1")
+        inputTapSleep 970 1820 1  # Formations
+        inputTapSleep 800 1600 1  # Popular
+        inputTapSleep 850 600  1   # 1st Formation
+        inputTapSleep 730 1800 1  # Use Formation
+        inputTapSleep 700 1240 1  # Confirm
+        ;;
+    "2")
+        inputTapSleep 970 1820 1  # Formations
+        inputTapSleep 800 1600 1  # Popular
+        inputTapSleep 850 775  1   # 2nd Formation
+        inputTapSleep 730 1800 1  # Use Formation
+        inputTapSleep 700 1240 1  # Confirm
+        ;;
+    "3")
+        inputTapSleep 970 1820 1  # Formations
+        inputTapSleep 800 1600 1  # Popular
+        inputTapSleep 850 950  1   # 3rd Formation
+        inputTapSleep 730 1800 1  # Use Formation
+        inputTapSleep 700 1240 1  # Confirm
+        ;;
+    esac
+}
+
+# ##############################################################################
 # Section       : Test
 # ##############################################################################
 
@@ -1883,6 +2030,9 @@ fi
 # Remark        : Can be skipped if you are already in the game
 # ##############################################################################
 init() {
+    pushCampaign
+    # pushKingsTower
+
     closeApp
     sleep 0.5
     startApp
@@ -1896,7 +2046,6 @@ init() {
         #Check special popup that need to be closed with the cross
         testColorORTapSleep 1100 300 131517
     done
-
     # Preload graphics
     switchTab "Campaign" true
     sleep 3
