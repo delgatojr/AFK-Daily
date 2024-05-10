@@ -37,6 +37,8 @@ The script acts depending on a set of variables. In order to change these, open 
 | `totalAmountTournamentTries`       | `Number` | The total amount of fights in the Legends' Challenger Tournament.                                              |   `0`   |
 | `totalAmountGuildBossTries`        | `Number` | The total amount of fights against a Guild Boss. The minimum is always 2, that's why its displayed as `2+X`.   |  `2+0`  |
 | `totalAmountTwistedRealmBossTries` | `Number` | The total amount of fights in the Twisted Realm.                                                               |   `1`   |
+| `totalFastRewards`                 | `Number` | The total amount of Fast Rewards to collect.                                                                   |   `1`   |
+| `storeRefreshes`                   | `Number` | The total amount of times to refresh store purchases                                                           |   `1`   |
 
 ## Store
 

@@ -494,7 +494,7 @@ verifyHEX() {
 # Descripton    : Default wait time for actions
 # ##############################################################################
 wait() {
-    sleep $DEFAULT_SLEEP
+    sleep "$DEFAULT_SLEEP"
 }
 
 # ##############################################################################
@@ -734,9 +734,9 @@ challengeBoss() {
         testColorORTapSleep 715 1260 fefffe # Check for confirm to exit button
     else
         # Quick exit battle
-        inputTapSleep 550 1850 3 # Battle
+        inputTapSleep 550 1850 4 # Battle
         inputTapSleep 80 1460    # Pause
-        inputTapSleep 230 960 1  # Exit
+        inputTapSleep 230 960 4  # Exit
 
         if testColorNAND 450 1775 cc9261; then # Check for multi-battle
             inputTapSleep 70 1810
@@ -746,8 +746,8 @@ challengeBoss() {
     wait
     if [ "$forceFightCampaign" = "true" ]; then
         verifyHEX 450 1775 cc9261 \
-            "Challenged boss in campaign. $(getCountersInColor $_challengeBoss_WIN $_challengeBoss_LOOSE)" \
-            "Failed to fight boss in Campaign. $(getCountersInColor $_challengeBoss_WIN $_challengeBoss_LOOSE)"
+            "Challenged boss in campaign. $(getCountersInColor "$_challengeBoss_WIN" "$_challengeBoss_LOOSE")" \
+            "Failed to fight boss in Campaign. $(getCountersInColor "$_challengeBoss_WIN" "$_challengeBoss_LOOSE")"
     else
         verifyHEX 450 1775 cc9261 "Challenged boss in campaign." "Failed to fight boss in Campaign."
     fi
@@ -782,11 +782,15 @@ collectFriendsAndMercenaries() {
 # ##############################################################################
 fastRewards() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fastRewards" >&2; fi
+    _fast_rewards_COUNT=0
     if testColorOR -d "$DEFAULT_DELTA" 980 1620 ed1f06; then # check red dot to see if free fast reward is avaible
-        inputTapSleep 950 1660 1
-        inputTapSleep 710 1260
-        inputTapSleep 560 1800 1
-        inputTapSleep 400 1250
+        inputTapSleep 950 1660 1     # Fast Rewards
+        until [ "$_fast_rewards_COUNT" -ge "$totalFastRewards" ]; do
+            inputTapSleep 710 1260 1 # Collect
+            inputTapSleep 560 1800 2 # Clear Popup
+            _fast_rewards_COUNT=$((_fast_rewards_COUNT + 1)) # Increment
+        done
+    inputTapSleep 400 1250           # Close
     else
         printInColor "INFO" "Fast Rewards collected already, not collecting..."
     fi
@@ -817,6 +821,7 @@ lootAfkChest() {
 arenaOfHeroes() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes" >&2; fi
     inputTapSleep 740 1050 3    # Arena of Heroes
+    inputTapSleep 550 80 2      # Collect Arena Tickets
     if [ "$pvpEventsActive" = "0" ]; then
         inputTapSleep 550 450 3 # Arena of Heroes
     elif [ "$pvpEventsActive" = "1" ]; then
@@ -831,7 +836,7 @@ arenaOfHeroes() {
     inputTapSleep 540 1800 # Challenge
 
     if testColorNAND 200 1800 382314 382214; then # Check for new season
-        _arenaOfHeroes_LOOSE=0
+        _arenaOfHeroes_LOSS=0
         _arenaOfHeroes_WIN=0
         printInColor "INFO" "Fighting in the Arena Of Heroes ${cCyan}$totalAmountArenaTries${cNc} time(s)."
         until [ "$totalAmountArenaTries" -le 0 ]; do # Repeat a battle for as long as totalAmountArenaTries
@@ -902,7 +907,7 @@ arenaOfHeroes() {
                         inputTapSleep 550 1550                         # Collect
                         _arenaOfHeroes_WIN=$((_arenaOfHeroes_WIN + 1)) # Increment
                     else
-                        _arenaOfHeroes_LOOSE=$((_arenaOfHeroes_LOOSE + 1)) # Increment
+                        _arenaOfHeroes_LOSS=$((_arenaOfHeroes_LOSS + 1)) # Increment
                     fi
                     inputTapSleep 550 1550 3 # Finish battle
                 else
@@ -922,13 +927,13 @@ arenaOfHeroes() {
         inputTapSleep 70 1810
         inputTapSleep 70 1810
         verifyHEX 240 1775 d49a61 \
-            "Checked the Arena of Heroes out. $(getCountersInColor $_arenaOfHeroes_WIN $_arenaOfHeroes_LOOSE)" \
-            "Failed to check the Arena of Heroes out. $(getCountersInColor $_arenaOfHeroes_WIN $_arenaOfHeroes_LOOSE)"
+            "Checked the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")" \
+            "Failed to check the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")"
     else
         inputTapSleep 70 1810
         verifyHEX 760 70 1f2d3a \
-            "Checked the Arena of Heroes out. $(getCountersInColor $_arenaOfHeroes_WIN $_arenaOfHeroes_LOOSE)" \
-            "Failed to check the Arena of Heroes out. $(getCountersInColor $_arenaOfHeroes_WIN $_arenaOfHeroes_LOOSE)"
+            "Checked the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")" \
+            "Failed to check the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")"
     fi
 }
 
@@ -1231,47 +1236,66 @@ teamBounties() {
 # ##############################################################################
 buyFromStore() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "buyFromStore" >&2; fi
+    _store_purchase_COUNT=0
     inputTapSleep 330 1750 3 # Store
 
-    if [ "$buyStoreDust" = true ]; then # Dust
-        buyFromStore_buyItem 175 1100
+    # if [ "$buyStoreDust" = true ]; then # Dust
+    #     buyFromStore_buyItem 175 1100
+    # fi
+    # if [ "$buyStorePoeCoins" = true ]; then # Poe Coins
+    #     buyFromStore_buyItem 675 1690
+    # fi
+    # # Primordial Emblem
+    # if [ "$buyStorePrimordialEmblem" = true ] && testColorOR -d "$DEFAULT_DELTA" 175 1690 c6ced5; then
+    #     buyFromStore_buyItem 175 1690
+    # fi
+    # # Amplifying Emblem
+    # if [ "$buyStoreAmplifyingEmblem" = true ] && testColorOR -d "$DEFAULT_DELTA" 175 1690 c59e71 cca67a; then
+    #     buyFromStore_buyItem 175 1690
+    # fi
+    # # Soulstone (widh 90 diamonds)
+    # if [ "$buyStoreSoulstone" = true ]; then
+    #     if testColorOR -d "$DEFAULT_DELTA" 910 1100 cf9ced; then # row 1, item 4
+    #         buyFromStore_buyItem 910 1100
+    #     fi
+    #     if testColorOR -d "$DEFAULT_DELTA" 650 1100 b165c0; then # row 1, item 3
+    #         buyFromStore_buyItem 650 1100
+    #     fi
+    # fi
+    # # Limited Elemental Shard
+    # if [ "$buyStoreLimitedElementalShard" = true ]; then
+    #     buyFromStore_buyItem 300 820
+    # fi
+    # # Limited Elemental Core
+    # if [ "$buyStoreLimitedElementalCore" = true ]; then
+    #     buyFromStore_buyItem 540 820
+    # fi
+    # # Limited Time Emblem
+    # if [ "$buyStoreLimitedTimeEmblem" = true ]; then
+    #     buyFromStore_buyItem 780 820
+    # fi
+
+    # Fuck all that just do Quick Buy
+    if testColorOR -d "5" 860 720 fad8a5; then
+        until [ "$_store_purchase_COUNT" -ge "$storeRefreshes" ]; do
+            inputTapSleep 940 720   # Quick Buy
+            inputTapSleep 720 1220  # Purchase
+            inputTapSleep 550 1700 2 # Close popup
+            _store_purchase_COUNT=$((_store_purchase_COUNT + 1)) # Increment
+            if [ "$_store_purchase_COUNT" -lt "$storeRefreshes" ]; then
+                inputTapSleep 1000 290 # Refresh
+                inputTapSleep 700 1270 # Confirm
+            fi
+            
+        done
+    else
+        printInColor INFO "Quick Buy not found."
     fi
-    if [ "$buyStorePoeCoins" = true ]; then # Poe Coins
-        buyFromStore_buyItem 675 1690
-    fi
-    # Primordial Emblem
-    if [ "$buyStorePrimordialEmblem" = true ] && testColorOR -d "$DEFAULT_DELTA" 175 1690 c6ced5; then
-        buyFromStore_buyItem 175 1690
-    fi
-    # Amplifying Emblem
-    if [ "$buyStoreAmplifyingEmblem" = true ] && testColorOR -d "$DEFAULT_DELTA" 175 1690 c59e71 cca67a; then
-        buyFromStore_buyItem 175 1690
-    fi
-    # Soulstone (widh 90 diamonds)
-    if [ "$buyStoreSoulstone" = true ]; then
-        if testColorOR -d "$DEFAULT_DELTA" 910 1100 cf9ced; then # row 1, item 4
-            buyFromStore_buyItem 910 1100
-        fi
-        if testColorOR -d "$DEFAULT_DELTA" 650 1100 b165c0; then # row 1, item 3
-            buyFromStore_buyItem 650 1100
-        fi
-    fi
-    # Limited Elemental Shard
-    if [ "$buyStoreLimitedElementalShard" = true ]; then
-        buyFromStore_buyItem 300 820
-    fi
-    # Limited Elemental Core
-    if [ "$buyStoreLimitedElementalCore" = true ]; then
-        buyFromStore_buyItem 540 820
-    fi
-    # Limited Time Emblem
-    if [ "$buyStoreLimitedTimeEmblem" = true ]; then
-        buyFromStore_buyItem 780 820
-    fi
+
     if [ "$forceWeekly" = true ]; then
         # Weekly - Purchase an item from the Guild Store once (check red dot first row for most useful item)
         if [ "$buyWeeklyGuild" = true ]; then
-            inputTapSleep 530 1810 # Guild Store
+            inputTapSleep 770 1810 # Guild Store
             if testColorOR -d "5" 620 750 ef1f06; then
                 buyFromStore_buyItem 550 820 # Limited
             elif testColorOR -d "5" 250 1040 b02004; then
@@ -1658,7 +1682,7 @@ checkWhereToEnd() {
     case "$endAt" in
     "oak")
         switchTab "Ranhorn" true
-        inputTapSleep 780 280 0
+        inputTapSleep 500 200 0
         ;;
     "soren")
         switchTab "Ranhorn" true
@@ -1730,8 +1754,8 @@ collectQuestChests() {
         inputTapSleep 860 610
     done
 
-    inputTapSleep 70 1650 1 # Return
-    verifyHEX 20 1775 d49a61 "Collected daily and weekly quest chests." "Failed to collect daily and weekly quest chests."
+    inputTapSleep 70 1650 2 # Return
+    verifyHEX 20 1775 54331a "Collected daily and weekly quest chests." "Failed to collect daily and weekly quest chests."
 }
 
 # ##############################################################################
@@ -1791,8 +1815,24 @@ collectMerchants() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectMerchants" >&2; fi
     inputTapSleep 120 300 10 # Merchants
     # WARN: Breaks if a pop-up message shows up
-    inputTapSleep 780 1820 2 # Merchant Ship
 
+    # Check for Monthly Card
+    if testColorOR -d "$DEFAULT_DELTA" 342 849 cd0000; then # Red exclamation mark
+        inputTapSleep 270 950 1 # Monthly Card Chest
+        inputTapSleep 550 300 1 # Collect rewards
+    else
+        printInColor "INFO" "No 'Monthly Card' reward to collect. [Tile]"
+    fi
+
+    # Check for Deluxe Monthly Card
+    if testColorOR -d "$DEFAULT_DELTA" 895 849 d10000; then # Red exclamation mark
+        inputTapSleep 820 950 1 # Deluxe Monthly Card Chest
+        inputTapSleep 550 300 1 # Collect rewards
+    else
+        printInColor "INFO" "No 'Deluxe Monthly Card' reward to collect. [Tile]"
+    fi
+    inputTapSleep 780 1820 2 # Merchant Ship
+    
     # Check for "Specials" freebie
     if testColorOR -d "$DEFAULT_DELTA" 365 740 ce0101; then
         inputTapSleep 210 945 1 # Free
@@ -1803,7 +1843,7 @@ collectMerchants() {
 
     # Check for "Daily Deals" freebie
     if testColorOR -d "$DEFAULT_DELTA" 345 1521 fe2108; then
-        inputTapSleep 280 1625 1
+        inputTapSleep 280 1625 2
         if testColorOR -d "$DEFAULT_DELTA" 365 515 d20101; then
             inputTapSleep 210 720 1 # Free
             inputTapSleep 550 300 1 # Collect rewards
