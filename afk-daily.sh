@@ -1816,19 +1816,18 @@ collectMerchants() {
 # Remark        : Breaks on boss battles (every 4 fights).
 # ##############################################################################
 pushCampaign(){
-    # if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushCampaign" >&2; fi
-    # inputTapSleep 550 1650 3            # Begin
-    # if testColorOR 550 740 f2d79f; then # Check if boss
-    #     inputTapSleep 550 1450 3        # Begin
-    # fi
-    
-    while [ true ]; do
+    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushCampaign" >&2; fi
+    _total_LOSS=0
+    _total_WIN=0
+    while true; do # runs until Ctl+c
         _formation=1
-        _challengeBoss_LOOSE=0
+        _challengeBoss_LOSS=0
         _challengeBoss_WIN=0
+        # Go back to 1st formation after trying 5th formation or after a win
         until [ "$_formation" -ge 6 ] || [ "$_challengeBoss_WIN" -ge 1 ]; do
             chooseFormation "$_formation"
-            until [ "$_challengeBoss_LOOSE" -ge 5 ] || [ "$_challengeBoss_WIN" -ge 1 ]; do
+            # Battles with chosen formation until either 5 losses or 1 win
+            until [ "$_challengeBoss_LOSS" -ge 5 ] || [ "$_challengeBoss_WIN" -ge 1 ]; do
                 inputTapSleep 550 1850 .5 # Battle
                 waitBattleStart
                 doAuto
@@ -1839,10 +1838,9 @@ pushCampaign(){
                     echo "${cGreen}WIN${cNc}"
                     _formation=1
                     _challengeBoss_WIN=$((_challengeBoss_WIN + 1)) # Increment
+                    _total_WIN=$((_total_WIN + 1)) # Increment
                     if testColorOR 550 1670 e2dddc; then # Check for next stage
-                        inputTapSleep 550 1670 6         # Next Stage
-                        sleep 6
-
+                        inputTapSleep 550 1670 13         # Next Stage
                         # WARN: Limited offers will fuck this part of the script up. I'm yet to find a way to close any possible offers.
                         # Tap top of the screen to close any possible Limited Offers
                         # inputTapSleep 550 75
@@ -1852,7 +1850,6 @@ pushCampaign(){
                         fi
                     else
                         inputTapSleep 550 1670 3 # Continue to next battle
-
                         if testColorNAND -d "$DEFAULT_DELTA" -f 200 1850 2b1a12; then # For low levels, does not exists (before stage 4)
                             inputTapSleep 550 1650 3                                  # Begin
                             if testColorOR 550 740 f2d79f; then                       # Check if boss
@@ -1862,7 +1859,8 @@ pushCampaign(){
                     fi
                 else                                               # Loose
                     echo "${cRed}Loss${cNc}"
-                    _challengeBoss_LOOSE=$((_challengeBoss_LOOSE + 1)) # Increment
+                    _challengeBoss_LOSS=$((_challengeBoss_LOSS + 1)) # Increment
+                    _total_LOSS=$((_total_LOSS + 1)) # Increment
                     inputTapSleep 550 1720 5                       # Try again
                     if testColorNAND -d "$DEFAULT_DELTA" -f 200 1850 2b1a12; then # For low levels, does not exists (before stage 4)
                         inputTapSleep 550 1650 3                                  # Begin
@@ -1873,8 +1871,9 @@ pushCampaign(){
                 fi
             done
             _formation=$((_formation + 1)) # Increment
-            _challengeBoss_LOOSE=0
+            _challengeBoss_LOSS=0
         done
+        echo "$(getCountersInColor $_total_WIN $_total_LOSS)"
     done
 }
 
@@ -2030,7 +2029,7 @@ fi
 # Remark        : Can be skipped if you are already in the game
 # ##############################################################################
 init() {
-    pushCampaign
+    # pushCampaign
     # pushKingsTower
 
     closeApp
