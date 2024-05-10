@@ -646,13 +646,13 @@ waitBattleStart() {
 pvpEvents() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pvpEvents" >&2; fi
     pvpEventsActive=0
-    if [ "$eventHoe" = true ]; then
+    if [ eventHoe = true ]; then
         pvpEventsActive=$((pvpEventsActive + 1)) # Increment
     fi
-    if [ "$eventTs" = true ]; then
+    if [ eventTs = true ]; then
         pvpEventsActive=$((pvpEventsActive + 1)) # Increment
     fi
-    if [ "$eventTv" = true ]; then
+    if [ eventTv = true ]; then
         pvpEventsActive=$((pvpEventsActive + 1)) # Increment
     fi
 }
@@ -817,9 +817,9 @@ lootAfkChest() {
 arenaOfHeroes() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes" >&2; fi
     inputTapSleep 740 1050 3    # Arena of Heroes
-    if [ "$pvpEventsActive" = "0" ]; then
+    if [ pvpEventsActive = "0" ]; then
         inputTapSleep 550 450 3 # Arena of Heroes
-    elif [ "$pvpEventsActive" = "1" ]; then
+    elif [ pvpEventsActive = "1" ]; then
         inputTapSleep 550 900 3 # Arena of Heroes
     else
         inputTapSleep 550 1400 3 # Arena of Heroes
@@ -1130,9 +1130,9 @@ legendsTournament() {
     # inputTapSleep 740 1050 1
     ## End of testing ##
 
-    if [ "$pvpEventsActive" = "0" ]; then
+    if [ pvpEventsActive = "0" ]; then
         inputTapSleep 550 900    # Legend's Challenger Tournament
-    elif [ "$pvpEventsActive" = "1" ]; then
+    elif [ pvpEventsActive = "1" ]; then
         inputTapSleep 550 1450   # Legend's Challenger Tournament
     else
         inputTapSleep 550 1800 3 # Legend's Challenger Tournament
@@ -1685,9 +1685,9 @@ checkWhereToEnd() {
     "championship")
         switchTab "Dark Forest" true
         inputTapSleep 740 1050
-        if [ "$pvpEventsActive" = "0" ]; then
+        if [ pvpEventsActive = "0" ]; then
             inputTapSleep 550 1370 0 # Championship
-        elif [ "$pvpEventsActive" = "1" ]; then
+        elif [ pvpEventsActive = "1" ]; then
             inputTapSleep 550 1680 0 # Championship
         else
             inputSwipe 550 1600 550 500 2 # Swipe up to see Championship
