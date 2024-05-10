@@ -746,8 +746,8 @@ challengeBoss() {
     wait
     if [ "$forceFightCampaign" = "true" ]; then
         verifyHEX 450 1775 cc9261 \
-            "Challenged boss in campaign. $(getCountersInColor $_challengeBoss_WIN $_challengeBoss_LOOSE)" \
-            "Failed to fight boss in Campaign. $(getCountersInColor $_challengeBoss_WIN $_challengeBoss_LOOSE)"
+            "Challenged boss in campaign. $(getCountersInColor "$_challengeBoss_WIN" "$_challengeBoss_LOOSE")" \
+            "Failed to fight boss in Campaign. $(getCountersInColor "$_challengeBoss_WIN" "$_challengeBoss_LOOSE")"
     else
         verifyHEX 450 1775 cc9261 "Challenged boss in campaign." "Failed to fight boss in Campaign."
     fi
@@ -835,7 +835,7 @@ arenaOfHeroes() {
     inputTapSleep 540 1800 # Challenge
 
     if testColorNAND 200 1800 382314 382214; then # Check for new season
-        _arenaOfHeroes_LOOSE=0
+        _arenaOfHeroes_LOSS=0
         _arenaOfHeroes_WIN=0
         printInColor "INFO" "Fighting in the Arena Of Heroes ${cCyan}$totalAmountArenaTries${cNc} time(s)."
         until [ "$totalAmountArenaTries" -le 0 ]; do # Repeat a battle for as long as totalAmountArenaTries
@@ -906,7 +906,7 @@ arenaOfHeroes() {
                         inputTapSleep 550 1550                         # Collect
                         _arenaOfHeroes_WIN=$((_arenaOfHeroes_WIN + 1)) # Increment
                     else
-                        _arenaOfHeroes_LOOSE=$((_arenaOfHeroes_LOOSE + 1)) # Increment
+                        _arenaOfHeroes_LOSS=$((_arenaOfHeroes_LOSS + 1)) # Increment
                     fi
                     inputTapSleep 550 1550 3 # Finish battle
                 else
@@ -926,13 +926,13 @@ arenaOfHeroes() {
         inputTapSleep 70 1810
         inputTapSleep 70 1810
         verifyHEX 240 1775 d49a61 \
-            "Checked the Arena of Heroes out. $(getCountersInColor $_arenaOfHeroes_WIN $_arenaOfHeroes_LOOSE)" \
-            "Failed to check the Arena of Heroes out. $(getCountersInColor $_arenaOfHeroes_WIN $_arenaOfHeroes_LOOSE)"
+            "Checked the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")" \
+            "Failed to check the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")"
     else
         inputTapSleep 70 1810
         verifyHEX 760 70 1f2d3a \
-            "Checked the Arena of Heroes out. $(getCountersInColor $_arenaOfHeroes_WIN $_arenaOfHeroes_LOOSE)" \
-            "Failed to check the Arena of Heroes out. $(getCountersInColor $_arenaOfHeroes_WIN $_arenaOfHeroes_LOOSE)"
+            "Checked the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")" \
+            "Failed to check the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")"
     fi
 }
 
