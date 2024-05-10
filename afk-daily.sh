@@ -782,11 +782,15 @@ collectFriendsAndMercenaries() {
 # ##############################################################################
 fastRewards() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fastRewards" >&2; fi
+    _fast_rewards_COUNT=0
     if testColorOR -d "$DEFAULT_DELTA" 980 1620 ed1f06; then # check red dot to see if free fast reward is avaible
-        inputTapSleep 950 1660 1
-        inputTapSleep 710 1260
-        inputTapSleep 560 1800 1
-        inputTapSleep 400 1250
+        inputTapSleep 950 1660 1     # Fast Rewards
+        until [ "$_fast_rewards_COUNT" -ge "$totalFastRewards" ]; do
+            inputTapSleep 710 1260 1 # Collect
+            inputTapSleep 560 1800 2 # Clear Popup
+            _fast_rewards_COUNT=$((_fast_rewards_COUNT + 1)) # Increment
+        done
+    inputTapSleep 400 1250           # Close
     else
         printInColor "INFO" "Fast Rewards collected already, not collecting..."
     fi
