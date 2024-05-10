@@ -734,9 +734,9 @@ challengeBoss() {
         testColorORTapSleep 715 1260 fefffe # Check for confirm to exit button
     else
         # Quick exit battle
-        inputTapSleep 550 1850 3 # Battle
+        inputTapSleep 550 1850 4 # Battle
         inputTapSleep 80 1460    # Pause
-        inputTapSleep 230 960 1  # Exit
+        inputTapSleep 230 960 4  # Exit
 
         if testColorNAND 450 1775 cc9261; then # Check for multi-battle
             inputTapSleep 70 1810
@@ -821,6 +821,7 @@ lootAfkChest() {
 arenaOfHeroes() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes" >&2; fi
     inputTapSleep 740 1050 3    # Arena of Heroes
+    inputTapSleep 550 80 2      # Collect Arena Tickets
     if [ "$pvpEventsActive" = "0" ]; then
         inputTapSleep 550 450 3 # Arena of Heroes
     elif [ "$pvpEventsActive" = "1" ]; then
@@ -1288,7 +1289,7 @@ buyFromStore() {
             
         done
     else
-        echo "Quick Buy not found."
+        printInColor INFO "Quick Buy not found."
     fi
 
     if [ "$forceWeekly" = true ]; then
@@ -1681,7 +1682,7 @@ checkWhereToEnd() {
     case "$endAt" in
     "oak")
         switchTab "Ranhorn" true
-        inputTapSleep 780 280 0
+        inputTapSleep 500 200 0
         ;;
     "soren")
         switchTab "Ranhorn" true
@@ -1753,8 +1754,8 @@ collectQuestChests() {
         inputTapSleep 860 610
     done
 
-    inputTapSleep 70 1650 1 # Return
-    verifyHEX 20 1775 d49a61 "Collected daily and weekly quest chests." "Failed to collect daily and weekly quest chests."
+    inputTapSleep 70 1650 2 # Return
+    verifyHEX 20 1775 54331a "Collected daily and weekly quest chests." "Failed to collect daily and weekly quest chests."
 }
 
 # ##############################################################################
@@ -1814,8 +1815,24 @@ collectMerchants() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectMerchants" >&2; fi
     inputTapSleep 120 300 10 # Merchants
     # WARN: Breaks if a pop-up message shows up
-    inputTapSleep 780 1820 2 # Merchant Ship
 
+    # Check for Monthly Card
+    if testColorOR -d "$DEFAULT_DELTA" 342 849 cd0000; then # Red exclamation mark
+        inputTapSleep 270 950 1 # Monthly Card Chest
+        inputTapSleep 550 300 1 # Collect rewards
+    else
+        printInColor "INFO" "No 'Monthly Card' reward to collect. [Tile]"
+    fi
+
+    # Check for Deluxe Monthly Card
+    if testColorOR -d "$DEFAULT_DELTA" 895 849 d10000; then # Red exclamation mark
+        inputTapSleep 820 950 1 # Deluxe Monthly Card Chest
+        inputTapSleep 550 300 1 # Collect rewards
+    else
+        printInColor "INFO" "No 'Deluxe Monthly Card' reward to collect. [Tile]"
+    fi
+    inputTapSleep 780 1820 2 # Merchant Ship
+    
     # Check for "Specials" freebie
     if testColorOR -d "$DEFAULT_DELTA" 365 740 ce0101; then
         inputTapSleep 210 945 1 # Free
@@ -1826,7 +1843,7 @@ collectMerchants() {
 
     # Check for "Daily Deals" freebie
     if testColorOR -d "$DEFAULT_DELTA" 345 1521 fe2108; then
-        inputTapSleep 280 1625 1
+        inputTapSleep 280 1625 2
         if testColorOR -d "$DEFAULT_DELTA" 365 515 d20101; then
             inputTapSleep 210 720 1 # Free
             inputTapSleep 550 300 1 # Collect rewards
