@@ -133,6 +133,7 @@ totalAmountTournamentTries=${totalAmountTournamentTries:-"0"}\n\
 totalAmountGuildBossTries=${totalAmountGuildBossTries:-"2+0"}\n\
 totalAmountTwistedRealmBossTries=${totalAmountTwistedRealmBossTries:-"1"}\n\
 totalFastRewards=${totalFastRewards:-"1"}\n\
+storeRefreshes=${storeRefreshes:-"1"}\n\
 \n\
 # Store\n\
 buyStoreDust=${buyStoreDust:-"true"}\n\
