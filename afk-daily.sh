@@ -494,7 +494,7 @@ verifyHEX() {
 # Descripton    : Default wait time for actions
 # ##############################################################################
 wait() {
-    sleep $DEFAULT_SLEEP
+    sleep "$DEFAULT_SLEEP"
 }
 
 # ##############################################################################
@@ -1235,47 +1235,66 @@ teamBounties() {
 # ##############################################################################
 buyFromStore() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "buyFromStore" >&2; fi
+    _store_purchase_COUNT=0
     inputTapSleep 330 1750 3 # Store
 
-    if [ "$buyStoreDust" = true ]; then # Dust
-        buyFromStore_buyItem 175 1100
+    # if [ "$buyStoreDust" = true ]; then # Dust
+    #     buyFromStore_buyItem 175 1100
+    # fi
+    # if [ "$buyStorePoeCoins" = true ]; then # Poe Coins
+    #     buyFromStore_buyItem 675 1690
+    # fi
+    # # Primordial Emblem
+    # if [ "$buyStorePrimordialEmblem" = true ] && testColorOR -d "$DEFAULT_DELTA" 175 1690 c6ced5; then
+    #     buyFromStore_buyItem 175 1690
+    # fi
+    # # Amplifying Emblem
+    # if [ "$buyStoreAmplifyingEmblem" = true ] && testColorOR -d "$DEFAULT_DELTA" 175 1690 c59e71 cca67a; then
+    #     buyFromStore_buyItem 175 1690
+    # fi
+    # # Soulstone (widh 90 diamonds)
+    # if [ "$buyStoreSoulstone" = true ]; then
+    #     if testColorOR -d "$DEFAULT_DELTA" 910 1100 cf9ced; then # row 1, item 4
+    #         buyFromStore_buyItem 910 1100
+    #     fi
+    #     if testColorOR -d "$DEFAULT_DELTA" 650 1100 b165c0; then # row 1, item 3
+    #         buyFromStore_buyItem 650 1100
+    #     fi
+    # fi
+    # # Limited Elemental Shard
+    # if [ "$buyStoreLimitedElementalShard" = true ]; then
+    #     buyFromStore_buyItem 300 820
+    # fi
+    # # Limited Elemental Core
+    # if [ "$buyStoreLimitedElementalCore" = true ]; then
+    #     buyFromStore_buyItem 540 820
+    # fi
+    # # Limited Time Emblem
+    # if [ "$buyStoreLimitedTimeEmblem" = true ]; then
+    #     buyFromStore_buyItem 780 820
+    # fi
+
+    # Fuck all that just do Quick Buy
+    if testColorOR -d "5" 860 720 fad8a5; then
+        until [ "$_store_purchase_COUNT" -ge "$storeRefreshes" ]; do
+            inputTapSleep 940 720   # Quick Buy
+            inputTapSleep 720 1220  # Purchase
+            inputTapSleep 550 1700 2 # Close popup
+            _store_purchase_COUNT=$((_store_purchase_COUNT + 1)) # Increment
+            if [ "$_store_purchase_COUNT" -lt "$storeRefreshes" ]; then
+                inputTapSleep 1000 290 # Refresh
+                inputTapSleep 700 1270 # Confirm
+            fi
+            
+        done
+    else
+        echo "Quick Buy not found."
     fi
-    if [ "$buyStorePoeCoins" = true ]; then # Poe Coins
-        buyFromStore_buyItem 675 1690
-    fi
-    # Primordial Emblem
-    if [ "$buyStorePrimordialEmblem" = true ] && testColorOR -d "$DEFAULT_DELTA" 175 1690 c6ced5; then
-        buyFromStore_buyItem 175 1690
-    fi
-    # Amplifying Emblem
-    if [ "$buyStoreAmplifyingEmblem" = true ] && testColorOR -d "$DEFAULT_DELTA" 175 1690 c59e71 cca67a; then
-        buyFromStore_buyItem 175 1690
-    fi
-    # Soulstone (widh 90 diamonds)
-    if [ "$buyStoreSoulstone" = true ]; then
-        if testColorOR -d "$DEFAULT_DELTA" 910 1100 cf9ced; then # row 1, item 4
-            buyFromStore_buyItem 910 1100
-        fi
-        if testColorOR -d "$DEFAULT_DELTA" 650 1100 b165c0; then # row 1, item 3
-            buyFromStore_buyItem 650 1100
-        fi
-    fi
-    # Limited Elemental Shard
-    if [ "$buyStoreLimitedElementalShard" = true ]; then
-        buyFromStore_buyItem 300 820
-    fi
-    # Limited Elemental Core
-    if [ "$buyStoreLimitedElementalCore" = true ]; then
-        buyFromStore_buyItem 540 820
-    fi
-    # Limited Time Emblem
-    if [ "$buyStoreLimitedTimeEmblem" = true ]; then
-        buyFromStore_buyItem 780 820
-    fi
+
     if [ "$forceWeekly" = true ]; then
         # Weekly - Purchase an item from the Guild Store once (check red dot first row for most useful item)
         if [ "$buyWeeklyGuild" = true ]; then
-            inputTapSleep 530 1810 # Guild Store
+            inputTapSleep 770 1810 # Guild Store
             if testColorOR -d "5" 620 750 ef1f06; then
                 buyFromStore_buyItem 550 820 # Limited
             elif testColorOR -d "5" 250 1040 b02004; then
