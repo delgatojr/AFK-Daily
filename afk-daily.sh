@@ -646,13 +646,13 @@ waitBattleStart() {
 pvpEvents() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pvpEvents" >&2; fi
     pvpEventsActive=0
-    if [ eventHoe = true]; then
+    if [ eventHoe = true ]; then
         pvpEventsActive=$((pvpEventsActive + 1)) # Increment
     fi
-    if [ eventTs = true]; then
+    if [ eventTs = true ]; then
         pvpEventsActive=$((pvpEventsActive + 1)) # Increment
     fi
-    if [ eventTv = true]; then
+    if [ eventTv = true ]; then
         pvpEventsActive=$((pvpEventsActive + 1)) # Increment
     fi
 }
