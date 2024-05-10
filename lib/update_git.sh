@@ -3,14 +3,14 @@
 # Script Name   : update_git.sh
 # Description   : Tools to work with git
 # Output        : return 0/1
-# GitHub        : https://github.com/zebscripts/AFK-Daily
+# GitHub        : https://github.com/delgatojr/AFK-Daily
 # License       : MIT
 # ##############################################################################
 
 # Consts
 headRowVersion=8
 headRowPatch=9
-remoteURL="https://raw.githubusercontent.com/zebscripts/AFK-Daily/master/README.md"
+remoteURL="https://raw.githubusercontent.com/delgatojr/AFK-Daily/master/README.md"
 
 # ##############################################################################
 # Function Name : checkUpdate

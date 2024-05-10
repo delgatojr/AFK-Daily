@@ -23,8 +23,8 @@ DEBUG=0
 DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
 eventHoe=false  # Set to `true` if "Heroes of Esperia" event is live
-eventTs=false   # Set to `true` if "Treasure Scramble" event is live
-eventThc=true   # Set to `true` if "Treasure Hunt Camp" event is live
+eventTs=true   # Set to `true` if "Treasure Scramble" event is live
+eventTv=true   # Set to `true` if "Treasure Vanguard" event is live
 totalAmountOakRewards=3
 
 # Do not modify
@@ -67,7 +67,7 @@ while getopts "ce:fgi:l:s:tv:w" opt; do
             case "$i" in
             "hoe") eventHoe=true ;; # Heroes of Esperia
             "ts") eventTs=true ;;   # Treasure Scramble (same problem as HoE atm)
-            "thc") eventThc=true ;;   # Treasure Hunt Camp (same problem as HoE atm)
+            "tv") eventTv=true ;;   # Treasure Vanguard (same problem as HoE atm)
             esac
         done
         IFS=$buIFS
@@ -244,7 +244,7 @@ HEXColorDelta() {
 # ##############################################################################
 inputSwipe() {
     if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "inputSwipe ${cPurple}$*${cNc}" >&2; fi
-    input swipe "$1" "$2" "$3" "$4" "$5"
+    input touchscreen swipe "$1" "$2" "$3" "$4" "$5"
     screenshotRequired=true
 }
 
@@ -640,6 +640,24 @@ waitBattleStart() {
 }
 
 # ##############################################################################
+# Function Name : pvpEvents
+# Descripton    : Counts the number of PvP Events.
+# ##############################################################################
+pvpEvents() {
+    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pvpEvents" >&2; fi
+    pvpEventsActive=0
+    if [ "$eventHoe" = true ]; then
+        pvpEventsActive=$((pvpEventsActive + 1)) # Increment
+    fi
+    if [ "$eventTs" = true ]; then
+        pvpEventsActive=$((pvpEventsActive + 1)) # Increment
+    fi
+    if [ "$eventTv" = true ]; then
+        pvpEventsActive=$((pvpEventsActive + 1)) # Increment
+    fi
+}
+
+# ##############################################################################
 # Section       : Campaign
 # ##############################################################################
 
@@ -798,11 +816,13 @@ lootAfkChest() {
 # ##############################################################################
 arenaOfHeroes() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes" >&2; fi
-    inputTapSleep 740 1050 3
-    if [ "$eventHoe" = false ] && [ "$eventTs" = false ] && [ "$eventThc" = false ]; then
-        inputTapSleep 550 450 3
+    inputTapSleep 740 1050 3    # Arena of Heroes
+    if [ "$pvpEventsActive" = "0" ]; then
+        inputTapSleep 550 450 3 # Arena of Heroes
+    elif [ "$pvpEventsActive" = "1" ]; then
+        inputTapSleep 550 900 3 # Arena of Heroes
     else
-        inputTapSleep 550 900 3
+        inputTapSleep 550 1400 3 # Arena of Heroes
     fi
     if testColorOR -d "$DEFAULT_DELTA" 1050 1770 e72707; then # Red mark? old value: e52505 (d=5), fb1e0d (d=5)
         inputTapSleep 1000 1800                               # Record
@@ -1109,10 +1129,13 @@ legendsTournament() {
     ## For testing only! Keep as comment ##
     # inputTapSleep 740 1050 1
     ## End of testing ##
-    if [ "$eventHoe" = false ] && [ "$eventTs" = false ] && [ "$eventThc" = false ]; then
-        inputTapSleep 550 900 # Legend's Challenger Tournament
+
+    if [ "$pvpEventsActive" = "0" ]; then
+        inputTapSleep 550 900    # Legend's Challenger Tournament
+    elif [ "$pvpEventsActive" = "1" ]; then
+        inputTapSleep 550 1450   # Legend's Challenger Tournament
     else
-        inputTapSleep 550 1450 # Legend's Challenger Tournament
+        inputTapSleep 550 1800 3 # Legend's Challenger Tournament
     fi
     inputTapSleep 550 280 3  # Chest
     inputTapSleep 550 1550 3 # Collect
@@ -1524,7 +1547,7 @@ oakInn() {
 
 # ##############################################################################
 # Function Name : strengthenCrystal
-# Descripton    : Strenghen Crystal
+# Descripton    : Strengthen Crystal
 # ##############################################################################
 strengthenCrystal() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "strengthenCrystal" >&2; fi
@@ -1662,10 +1685,14 @@ checkWhereToEnd() {
     "championship")
         switchTab "Dark Forest" true
         inputTapSleep 740 1050
-        if [ "$eventHoe" = false ] && [ "$eventTs" = false ] && [ "$eventThc" = false ]; then
-            inputTapSleep 550 1370 0
+        if [ "$pvpEventsActive" = "0" ]; then
+            inputTapSleep 550 1370 0 # Championship
+        elif [ "$pvpEventsActive" = "1" ]; then
+            inputTapSleep 550 1680 0 # Championship
         else
-            inputTapSleep 550 1680 0
+            inputSwipe 550 1600 550 500 2 # Swipe up to see Championship
+            sleep 1
+            inputTapSleep 550 1700 0 # Legend's Challenger Tournament
         fi
         ;;
     "closeApp")
@@ -2139,7 +2166,7 @@ if [ "$testServer" = true ]; then printInColor "INFO" "Test server: ${cBlue}ON${
 # Events
 if [ "$eventHoe" = true ]; then activeEvents="${activeEvents}| Heroes of Esperia |"; fi
 if [ "$eventTs" = true ]; then activeEvents="${activeEvents}| Treasure Scramble |"; fi
-if [ "$eventThc" = true ]; then activeEvents="${activeEvents}| Treasure Hunt Camp |"; fi
+if [ "$eventTv" = true ]; then activeEvents="${activeEvents}| Treasure Vanguard |"; fi
 if [ -n "$activeEvents" ]; then printInColor "INFO" "Active event(s): ${cBlue}${activeEvents}${cNc}"; fi
 
 echo
