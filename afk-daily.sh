@@ -1933,6 +1933,7 @@ init() {
     sleep 3
     switchTab "Dark Forest"
     sleep 1
+    
     # Check for HoE event
     if testColorOR -d "$DEFAULT_DELTA" 770 1165 c19e3a; then
         printInColor "INFO" "Heroes of Esperia event detected."
