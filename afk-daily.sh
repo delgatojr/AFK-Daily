@@ -561,7 +561,8 @@ switchTab() {
             [ "$doTeamBounties" = true ] ||
             [ "$doArenaOfHeroes" = true ] ||
             [ "$doLegendsTournament" = true ] ||
-            [ "$doKingsTower" = true ]; then
+            [ "$doKingsTower" = true ]
+            [ "$doFountainOfTime" = true ]; then
             inputTapSleep 300 1850 2
             inputTapSleep 300 1850
             activeTab="$1"
@@ -1224,6 +1225,20 @@ teamBounties() {
     inputTapSleep 550 1500   # Confirm
     inputTapSleep 70 1810    # Return
     verifyHEX 240 1775 d49a61 "Collected/dispatched team bounties." "Failed to collect/dispatch team bounties."
+}
+
+# ##############################################################################
+# Function Name : fountainOfTime
+# Descripton    : Collects the Fountain of Time rewards.
+# ##############################################################################
+fountainOfTime() {
+    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fountainOfTime ${cPurple}$*${cNc}" >&2; fi
+    inputTapSleep 800 700 4  # Temporal Rift
+    inputTapSleep 250 1350 2 # Fountain of Time
+    inputTapSleep 730 1360 2 # Collect
+    inputTapSleep 70 1810    # Return
+    inputTapSleep 70 1810    # Return
+    verifyHEX 240 1775 d49a61 "Collected Fountain of Time." "Failed to collect Fountain of Time."
 }
 
 # ##############################################################################
@@ -2020,6 +2035,7 @@ run() {
         if checkToDo doLegendsTournament; then legendsTournament; fi
     elif checkToDo doLegendsTournament; then legendsTournament true; fi
     if checkToDo doKingsTower; then kingsTower; fi
+    if checkToDo doFountainOfTime; then fountainOfTime; fi
 
     # RANHORN TAB
     switchTab "Ranhorn"

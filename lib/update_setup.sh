@@ -169,6 +169,7 @@ doTeamBounties=${doTeamBounties:-"true"}\n\
 doArenaOfHeroes=${doArenaOfHeroes:-"true"}\n\
 doLegendsTournament=${doLegendsTournament:-"true"}\n\
 doKingsTower=${doKingsTower:-"true"}\n\
+doFountainOfTime=${doFountainOfTime:-"true"}\n\
 \n\
 # Ranhorn\n\
 doGuildHunts=${doGuildHunts:-"true"}\n\
