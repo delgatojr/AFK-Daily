@@ -1952,11 +1952,11 @@ pushCampaign(){
 pushKingsTower(){
     while [ true ]; do
         _formation=1
-        _kingsTower_battle_COUNT=0 # Equivalent to loose
+        _kingsTower_battle_COUNT=0 # Equivalent to lose
         _kingsTower_battle_WIN=0
         until [ "$_formation" -ge 6 ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
             chooseFormation "$_formation"
-            until [ "$_kingsTower_battle_COUNT" -ge 5 ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
+            until [ "$_kingsTower_battle_COUNT" -ge 4 ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
                 inputTapSleep 550 1850 0 # Battle
                 waitBattleStart
                 doAuto
@@ -1965,6 +1965,7 @@ pushKingsTower(){
                 # Check if win or lose battle
                 if [ "$battleFailed" = false ]; then
                     echo "${cGreen}WIN${cNc}"
+                    _formation=1
                     _kingsTower_battle_WIN=$((_kingsTower_battle_WIN + 1)) # Increment
                     inputTapSleep 550 1850 4                               # Collect
                     inputTapSleep 550 170                                  # Tap on the top to close possible limited offer
