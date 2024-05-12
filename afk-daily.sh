@@ -548,7 +548,8 @@ switchTab() {
             [ "$doChallengeBoss" = true ] ||
             [ "$doFastRewards" = true ] ||
             [ "$doCollectFriendsAndMercenaries" = true ] ||
-            [ "$doLootAfkChest" = true ]; then
+            [ "$doLootAfkChest" = true ] ||
+            [ "$doPushCampaign" ]; then
             inputTapSleep 550 1850 2
             inputTapSleep 550 1850
             activeTab="$1"
@@ -561,7 +562,8 @@ switchTab() {
             [ "$doTeamBounties" = true ] ||
             [ "$doArenaOfHeroes" = true ] ||
             [ "$doLegendsTournament" = true ] ||
-            [ "$doKingsTower" = true ]; then
+            [ "$doKingsTower" = true ] ||
+            [ "$doPushKingsTower" ]; then
             inputTapSleep 300 1850 2
             inputTapSleep 300 1850
             activeTab="$1"
@@ -1907,16 +1909,14 @@ pushCampaign(){
                     _challengeBoss_WIN=$((_challengeBoss_WIN + 1)) # Increment
                     _total_WIN=$((_total_WIN + 1)) # Increment
                     if testColorOR 550 1670 e2dddc; then # Check for next stage
-                        inputTapSleep 550 1670 13         # Next Stage
-                        # WARN: Limited offers will fuck this part of the script up. I'm yet to find a way to close any possible offers.
-                        # Tap top of the screen to close any possible Limited Offers
-                        # inputTapSleep 550 75
-                        
+                        inputTapSleep 550 1670 15         # Next Stage
+                        inputTapSleep 550 75 # Limited Offers
                         if testColorOR 550 740 f2d79f; then # Check if boss
-                            inputTapSleep 550 1450 6
+                            inputTapSleep 550 1450 8
                         fi
                     else
                         inputTapSleep 550 1670 3 # Continue to next battle
+                        inputTapSleep 550 75     # Limited Offers
                         if testColorNAND -d "$DEFAULT_DELTA" -f 200 1850 2b1a12; then # For low levels, does not exists (before stage 4)
                             inputTapSleep 550 1650 3                                  # Begin
                             if testColorOR 550 740 f2d79f; then                       # Check if boss
@@ -1940,54 +1940,140 @@ pushCampaign(){
             _formation=$((_formation + 1)) # Increment
             _challengeBoss_LOSS=0
         done
-        echo "$(getCountersInColor $_total_WIN $_total_LOSS)"
+        getCountersInColor $_total_WIN $_total_LOSS
     done
 }
 
 # ##############################################################################
 # Function Name : pushKingsTower
 # Descripton    : Pushes campaign using popular formations
-# Remark        : Loops until you manually exit script
+# Remark        : Works best if you set formations in King's Tower beforehand.
+#                 Loops until you manually exit script.
 # ##############################################################################
 pushKingsTower(){
-    while [ true ]; do
-        _formation=1
-        _kingsTower_battle_COUNT=0 # Equivalent to lose
+    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushKingsTower" >&2; fi
+    if $doUsePopularFormations; then
+        _popularFormation=1
+    fi
+    if $doUseOwnFormations; then
+        _ownFormation=1
+    fi
+    _total_Kings_Tower_LOSS=0
+    _total_Kings_Tower_WIN=0
+    switchTab "Dark Forest"
+    inputTapSleep 550 850 5 # King's Tower
+
+    if [ "$doMainTower" = true ]; then
+        inputTapSleep 550 800 # Main Tower
+    fi
+
+    if [ "$doTowerOfLight" = true ] && { [ "$dayofweek" -eq 1 ] || [ "$dayofweek" -eq 5 ] || [ "$dayofweek" -eq 7 ]; }; then
+        inputTapSleep 300 950 # Tower of Light
+    fi
+
+    if [ "$doTheBrutalCitadel" = true ] && { [ "$dayofweek" -eq 2 ] || [ "$dayofweek" -eq 5 ] || [ "$dayofweek" -eq 7 ]; }; then
+        inputTapSleep 400 1250 # The Brutal Citadel
+    fi
+
+    if [ "$doTheWorldTree" = true ] && { [ "$dayofweek" -eq 3 ] || [ "$dayofweek" -eq 6 ] || [ "$dayofweek" -eq 7 ]; }; then
+        inputTapSleep 750 660 # The World Tree
+    fi
+
+    if [ "$doCelestialSanctum" = true ] && { [ "$dayofweek" -eq 3 ] || [ "$dayofweek" -eq 5 ] || [ "$dayofweek" -eq 7 ]; }; then
+        inputTapSleep 270 500 # Celestial Sanctum
+    fi
+
+    if [ "$doTheForsakenNecropolis" = true ] && { [ "$dayofweek" -eq 4 ] || [ "$dayofweek" -eq 6 ] || [ "$dayofweek" -eq 7 ]; }; then
+        inputTapSleep 780 1100 # The Forsaken Necropolis
+    fi
+
+    if [ "$doInfernalFortress" = true ] && { [ "$dayofweek" -eq 4 ] || [ "$dayofweek" -eq 6 ] || [ "$dayofweek" -eq 7 ]; }; then
+        inputTapSleep 620 1550 # Infernal Fortress
+    fi
+
+    inputTapSleep 540 1350 3 # Challenge
+
+    while true; do
+        _kingsTower_own_battle_COUNT=0     # Loss Counter for Own Formations
+        _kingsTower_popular_battle_COUNT=0 # Loss Counter for Popular Formations
         _kingsTower_battle_WIN=0
-        until [ "$_formation" -ge 6 ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
-            chooseFormation "$_formation"
-            until [ "$_kingsTower_battle_COUNT" -ge 4 ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
+
+        # Cycle through Own Formations until "totalOwnFormations" or a win
+        until [ "$_ownFormation" -gt "$totalOwnFormations" ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
+            if $doUseOwnFormations; then
+                chooseFormation "Own" "$_ownFormation"
+            fi
+            until [ "$_kingsTower_own_battle_COUNT" -ge "$maxFormationTries" ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
                 inputTapSleep 550 1850 0 # Battle
                 waitBattleStart
                 doAuto
                 doSpeed
                 waitBattleFinish 2
                 # Check if win or lose battle
-                if [ "$battleFailed" = false ]; then
-                    echo "${cGreen}WIN${cNc}"
-                    _formation=1
-                    _kingsTower_battle_WIN=$((_kingsTower_battle_WIN + 1)) # Increment
-                    inputTapSleep 550 1850 4                               # Collect
-                    inputTapSleep 550 170                                  # Tap on the top to close possible limited offer
-
-                    # WARN: Limited offers might screw this up. Tapping 550 170 might close an offer.
-                    # Tap top of the screen to close any possible Limited Offers
-                    # if testColorOR 550 140 1a1212; then # not on screen with Challenge button
-                    #     inputTapSleep 550 75        # Tap top of the screen to close Limited Offer
-                    #     if testColorOR 550 140 1a1212; then # think i remember it needs two taps to close offer
-                    #         inputTapSleep 550 75    # Tap top of the screen to close Limited Offer
-                    # fi
-
-                    inputTapSleep 540 1350 # Challenge
+                if [ "$battleFailed" = false ]; then # Win
+                    printInColor INFO "${cGreen}WIN${cNc}"
+                    _kingsTower_battle_WIN=$((_kingsTower_battle_WIN + 1))     # Increment
+                    _total_Kings_Tower_WIN=$((_total_Kings_Tower_WIN + 1))     # Increment
+                    inputTapSleep 550 1850 4                                   # Collect
+                    inputTapSleep 550 170                                      # Tap on the top to close possible limited offer
+                    inputTapSleep 540 1350                                     # Challenge
                 elif [ "$battleFailed" = true ]; then
-                    echo "${cRed}Loss${cNc}"
-                    inputTapSleep 550 1720                                     # Try again
-                    _kingsTower_battle_COUNT=$((_kingsTower_battle_COUNT + 1)) # Increment
+                    printInColor INFO "${cRed}Loss${cNc}"
+                    inputTapSleep 550 1720                                             # Try again
+                    _kingsTower_own_battle_COUNT=$((_kingsTower_own_battle_COUNT + 1)) # Increment
+                    _total_Kings_Tower_LOSS=$((_total_Kings_Tower_LOSS + 1))           # Increment
                 fi
             done
-            _formation=$((_formation + 1)) # Increment
-            _kingsTower_battle_COUNT=0
+            _ownFormation=$((_ownFormation + 1)) # Increment
+            _kingsTower_own_battle_COUNT=0       # Reset counter back to zero
         done
+
+        # Cycle through Popular Formations until "totalPopularFormations" or a win
+        until [ "$_popularFormation" -gt "$totalPopularFormations" ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
+            if $doUsePopularFormations; then
+                chooseFormation "Popular" "$_popularFormation"
+            fi
+            until [ "$_kingsTower_popular_battle_COUNT" -ge "$maxFormationTries" ] || [ "$_kingsTower_battle_WIN" -ge 1 ]; do
+                inputTapSleep 550 1850 0 # Battle
+                waitBattleStart
+                doAuto
+                doSpeed
+                waitBattleFinish 2
+                # Check if win or lose battle
+                if [ "$battleFailed" = false ]; then # Win
+                    printInColor INFO "${cGreen}WIN${cNc}"
+                    _popularFormation=1
+                    _kingsTower_battle_WIN=$((_kingsTower_battle_WIN + 1))     # Increment
+                    _total_Kings_Tower_WIN=$((_total_Kings_Tower_WIN + 1))     # Increment
+                    inputTapSleep 550 1850 4                                   # Collect
+                    inputTapSleep 550 170                                      # Tap on the top to close possible limited offer
+                    inputTapSleep 540 1350                                     # Challenge
+                elif [ "$battleFailed" = true ]; then
+                    printInColor INFO "${cRed}Loss${cNc}"
+                    inputTapSleep 550 1720                                                     # Try again
+                    _kingsTower_popular_battle_COUNT=$((_kingsTower_popular_battle_COUNT + 1)) # Increment
+                    _total_Kings_Tower_LOSS=$((_total_Kings_Tower_LOSS + 1))                   # Increment
+                fi
+            done
+            _popularFormation=$((_popularFormation + 1)) # Increment
+            _kingsTower_popular_battle_COUNT=0           # Reset counter back to zero
+        done
+
+        # Reset Formations back to one
+        if $doUsePopularFormations; then
+            _popularFormation=1
+        fi
+        if $doUseOwnFormations; then
+            _ownFormation=1
+        fi
+
+        printInColor INFO "${cGreen}$_total_Kings_Tower_WIN Wins${cNc} / ${cRed}$_total_Kings_Tower_LOSS Losses${cNcS}"
+        # if not at battle screen reset game.
+        if testColorNAND 550 1120 deba85; then
+            printInColor "ERROR" "Not at Battle Screen. Reseting Game."
+            init
+            run
+        fi
     done
 }
 
@@ -1995,31 +2081,49 @@ pushKingsTower(){
 # ##############################################################################
 # Function Name : chooseFormation
 # Descripton    : Chooses a popular formation
-# Args          : <FORMATION_#>
+# Args          : <TYPE> <FORMATION>
+#                   <TYPE>: Own / Popular
+#                   <FORMATION> : 1/2/3/4/5
 # ##############################################################################
 chooseFormation(){
-    echo "Choosing Formation $1"
+    printInColor INFO "Choosing $1 Formation $2"
     case "$1" in
-    "1")
-        inputTapSleep 970 1820 1  # Formations
-        inputTapSleep 800 1600 1  # Popular
-        inputTapSleep 850 600  1   # 1st Formation
-        inputTapSleep 730 1800 1  # Use Formation
-        inputTapSleep 700 1240 1  # Confirm
+    "Own")
+        case "$2" in
+        "1")
+            inputTapSleep 80 1100  # Own Formations
+            inputTapSleep 900 1300 # First Formation
+            ;;
+        "2")
+            inputTapSleep 80 1100  # Own Formations
+            inputTapSleep 900 1500 # Second Formation
+            ;;
+        esac
         ;;
-    "2")
-        inputTapSleep 970 1820 1  # Formations
-        inputTapSleep 800 1600 1  # Popular
-        inputTapSleep 850 775  1   # 2nd Formation
-        inputTapSleep 730 1800 1  # Use Formation
-        inputTapSleep 700 1240 1  # Confirm
-        ;;
-    "3")
-        inputTapSleep 970 1820 1  # Formations
-        inputTapSleep 800 1600 1  # Popular
-        inputTapSleep 850 950  1   # 3rd Formation
-        inputTapSleep 730 1800 1  # Use Formation
-        inputTapSleep 700 1240 1  # Confirm
+    "Popular")
+        case "$2" in
+        "1")
+            inputTapSleep 970 1820 1  # Formations
+            inputTapSleep 800 1600 1  # Popular
+            inputTapSleep 850 600  1   # 1st Formation
+            inputTapSleep 730 1800 1  # Use Formation
+            inputTapSleep 700 1240 1  # Confirm
+            ;;
+        "2")
+            inputTapSleep 970 1820 1  # Formations
+            inputTapSleep 800 1600 1  # Popular
+            inputTapSleep 850 775  1   # 2nd Formation
+            inputTapSleep 730 1800 1  # Use Formation
+            inputTapSleep 700 1240 1  # Confirm
+            ;;
+        "3")
+            inputTapSleep 970 1820 1  # Formations
+            inputTapSleep 800 1600 1  # Popular
+            inputTapSleep 850 950  1   # 3rd Formation
+            inputTapSleep 730 1800 1  # Use Formation
+            inputTapSleep 700 1240 1  # Confirm
+            ;;
+        esac
         ;;
     esac
 }
@@ -2097,9 +2201,6 @@ fi
 # Remark        : Can be skipped if you are already in the game
 # ##############################################################################
 init() {
-    # pushCampaign
-    # pushKingsTower
-
     closeApp
     sleep 0.5
     startApp
@@ -2149,6 +2250,10 @@ init() {
 # ##############################################################################
 run() {
     if [ "$hasEnded" = true ]; then return 0; fi # If the script has restarted we need a way to stop looping at the end.
+
+    # PUSH
+    if checkToDo doPushCampaign; then pushCampaign; fi
+    if checkToDo doPushKingsTower; then pushKingsTower; fi
 
     # CAMPAIGN TAB
     switchTab "Campaign"
