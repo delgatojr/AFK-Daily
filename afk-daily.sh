@@ -2143,16 +2143,14 @@ collectMerchants() {
     if testColorOR -d "$DEFAULT_DELTA" 342 849 cd0000; then # Red exclamation mark
         inputTapSleep 270 950 1 # Monthly Card Chest
         inputTapSleep 550 300 1 # Collect rewards
-    else
-        printInColor "INFO" "No 'Monthly Card' reward to collect. [Tile]"
+        sleep 2
     fi
 
     # Check for Deluxe Monthly Card
     if testColorOR -d "$DEFAULT_DELTA" 895 849 d10000; then # Red exclamation mark
         inputTapSleep 820 950 1 # Deluxe Monthly Card Chest
         inputTapSleep 550 300 1 # Collect rewards
-    else
-        printInColor "INFO" "No 'Deluxe Monthly Card' reward to collect. [Tile]"
+        sleep 2
     fi
     inputTapSleep 780 1820 2 # Merchant Ship
     
