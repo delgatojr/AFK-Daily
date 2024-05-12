@@ -23,8 +23,8 @@ DEBUG=0
 DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
 eventHoe=false  # Set to `true` if "Heroes of Esperia" event is live
-eventTs=true   # Set to `true` if "Treasure Scramble" event is live
-eventTv=true   # Set to `true` if "Treasure Vanguard" event is live
+eventTs=true    # Set to `true` if "Treasure Scramble" event is live
+eventTv=true    # Set to `true` if "Treasure Vanguard" event is live
 totalAmountOakRewards=3
 
 # Do not modify
@@ -557,14 +557,16 @@ switchTab() {
         fi
         ;;
     "Dark Forest")
-        if [ "${2:-false}" = true ] ||
-            [ "$doSoloBounties" = true ] ||
-            [ "$doTeamBounties" = true ] ||
-            [ "$doArenaOfHeroes" = true ] ||
-            [ "$doLegendsTournament" = true ] ||
-            [ "$doKingsTower" = true ]
+        if
+            [ "${2:-false}" = true ] ||
+                [ "$doSoloBounties" = true ] ||
+                [ "$doTeamBounties" = true ] ||
+                [ "$doArenaOfHeroes" = true ] ||
+                [ "$doLegendsTournament" = true ] ||
+                [ "$doKingsTower" = true ]
             [ "$doFountainOfTime" = true ] ||
-            [ "$doPushKingsTower" = true ]; then
+                [ "$doPushKingsTower" = true ]
+        then
             inputTapSleep 300 1850 2
             inputTapSleep 300 1850
             activeTab="$1"
@@ -787,13 +789,13 @@ fastRewards() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fastRewards" >&2; fi
     _fast_rewards_COUNT=0
     if testColorOR -d "$DEFAULT_DELTA" 980 1620 ed1f06; then # check red dot to see if free fast reward is avaible
-        inputTapSleep 950 1660 1     # Fast Rewards
+        inputTapSleep 950 1660 1                             # Fast Rewards
         until [ "$_fast_rewards_COUNT" -ge "$totalFastRewards" ]; do
-            inputTapSleep 710 1260 1 # Collect
-            inputTapSleep 560 1800 2 # Clear Popup
+            inputTapSleep 710 1260 1                         # Collect
+            inputTapSleep 560 1800 2                         # Clear Popup
             _fast_rewards_COUNT=$((_fast_rewards_COUNT + 1)) # Increment
         done
-    inputTapSleep 400 1250           # Close
+        inputTapSleep 400 1250 # Close
     else
         printInColor "INFO" "Fast Rewards collected already, not collecting..."
     fi
@@ -818,7 +820,7 @@ lootAfkChest() {
 # Descripton    : Pushes campaign using popular formations
 # Remark        : Loops until you manually exit script.
 # ##############################################################################
-pushCampaign(){
+pushCampaign() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushCampaign" >&2; fi
     if $doUsePopularFormations; then
         _popularFormation=1
@@ -850,7 +852,7 @@ pushCampaign(){
                     push "Campaign" "Own"
                 done
                 _ownFormation=$((_ownFormation + 1)) # Increment formation
-                _own_battle_COUNT=0       # Reset loss counter
+                _own_battle_COUNT=0                  # Reset loss counter
             done
         fi
 
@@ -865,7 +867,7 @@ pushCampaign(){
                     push "Campaign" "Popular"
                 done
                 _popularFormation=$((_popularFormation + 1)) # Increment formation
-                _popular_battle_COUNT=0           # Reset counter back to zero
+                _popular_battle_COUNT=0                      # Reset counter back to zero
             done
         fi
 
@@ -893,7 +895,7 @@ pushCampaign(){
 # ##############################################################################
 # Function Name : push
 # Descripton    : Battling for pushing Campaign or King's Tower.
-# Args          : <MODE> <TYPE> 
+# Args          : <MODE> <TYPE>
 #                   <MODE>: Campaign, KT (King's Tower)
 #                   <TYPE>: Own, Popular
 # ##############################################################################
@@ -906,11 +908,11 @@ push() {
     # Check if win or lose battle
     if [ "$battleFailed" = false ]; then # Win
         printInColor INFO "${cGreen}WIN${cNc}"
-        if [ "$1" = "KT" ]; then         # King's Tower
-            inputTapSleep 550 1850 4     # Collect
-            inputTapSleep 550 75         # Tap on the top to close possible limited offer
-            inputTapSleep 540 1350       # Challenge
-        elif [ "$1" = "Campaign" ]; then # Campaign
+        if [ "$1" = "KT" ]; then                    # King's Tower
+            inputTapSleep 550 1850 4                # Collect
+            inputTapSleep 550 75                    # Tap on the top to close possible limited offer
+            inputTapSleep 540 1350                  # Challenge
+        elif [ "$1" = "Campaign" ]; then            # Campaign
             if testColorOR 550 1670 e2dddc; then    # Check for next stage
                 inputTapSleep 550 1670 15           # Next Stage
                 inputTapSleep 550 75                # Limited Offers
@@ -923,13 +925,13 @@ push() {
             fi
         fi
         _battle_WIN=$((_battle_WIN + 1)) # Increment
-        _total_WIN=$((_total_WIN + 1)) # Increment
-    else # Loss
+        _total_WIN=$((_total_WIN + 1))   # Increment
+    else                                 # Loss
         printInColor INFO "${cRed}Loss${cNc}"
-        if [ "$1" = "KT" ]; then      # King's Tower
-            inputTapSleep 550 1720 # Try again
+        if [ "$1" = "KT" ]; then         # King's Tower
+            inputTapSleep 550 1720       # Try again
         elif [ "$1" = "Campaign" ]; then # Campaign
-            inputTapSleep 550 1670 3 # Continue to next battle
+            inputTapSleep 550 1670 3     # Continue to next battle
         fi
         if [ "$2" = "Own" ]; then
             _own_battle_COUNT=$((_own_battle_COUNT + 1)) # Increment
@@ -953,7 +955,7 @@ push() {
 #                   <TYPE>: Own / Popular
 #                   <FORMATION>: 1,2,3,4,5,6
 # ##############################################################################
-chooseFormation(){
+chooseFormation() {
     printInColor INFO "Choosing $1 Formation $2"
     case "$1" in
     "Own")
@@ -971,46 +973,46 @@ chooseFormation(){
     "Popular")
         case "$2" in
         "1")
-            inputTapSleep 970 1820 1  # Formations
-            inputTapSleep 800 1600 1  # Popular
-            inputTapSleep 850 600  1   # 1st Formation
-            inputTapSleep 730 1800 1  # Use Formation
-            inputTapSleep 700 1240 1  # Confirm
+            inputTapSleep 970 1820 1 # Formations
+            inputTapSleep 800 1600 1 # Popular
+            inputTapSleep 850 600 1  # 1st Formation
+            inputTapSleep 730 1800 1 # Use Formation
+            inputTapSleep 700 1240 1 # Confirm
             ;;
         "2")
-            inputTapSleep 970 1820 1  # Formations
-            inputTapSleep 800 1600 1  # Popular
-            inputTapSleep 850 775  1   # 2nd Formation
-            inputTapSleep 730 1800 1  # Use Formation
-            inputTapSleep 700 1240 1  # Confirm
+            inputTapSleep 970 1820 1 # Formations
+            inputTapSleep 800 1600 1 # Popular
+            inputTapSleep 850 775 1  # 2nd Formation
+            inputTapSleep 730 1800 1 # Use Formation
+            inputTapSleep 700 1240 1 # Confirm
             ;;
         "3")
-            inputTapSleep 970 1820 1  # Formations
-            inputTapSleep 800 1600 1  # Popular
-            inputTapSleep 850 950  1   # 3rd Formation
-            inputTapSleep 730 1800 1  # Use Formation
-            inputTapSleep 700 1240 1  # Confirm
+            inputTapSleep 970 1820 1 # Formations
+            inputTapSleep 800 1600 1 # Popular
+            inputTapSleep 850 950 1  # 3rd Formation
+            inputTapSleep 730 1800 1 # Use Formation
+            inputTapSleep 700 1240 1 # Confirm
             ;;
         "4")
-            inputTapSleep 970 1820 1  # Formations
-            inputTapSleep 800 1600 1  # Popular
-            inputTapSleep 850 1130 1  # 4th Formation
-            inputTapSleep 730 1800 1  # Use Formation
-            inputTapSleep 700 1240 1  # Confirm
+            inputTapSleep 970 1820 1 # Formations
+            inputTapSleep 800 1600 1 # Popular
+            inputTapSleep 850 1130 1 # 4th Formation
+            inputTapSleep 730 1800 1 # Use Formation
+            inputTapSleep 700 1240 1 # Confirm
             ;;
         "5")
-            inputTapSleep 970 1820 1  # Formations
-            inputTapSleep 800 1600 1  # Popular
-            inputTapSleep 850 1300 1  # 5th Formation
-            inputTapSleep 730 1800 1  # Use Formation
-            inputTapSleep 700 1240 1  # Confirm
+            inputTapSleep 970 1820 1 # Formations
+            inputTapSleep 800 1600 1 # Popular
+            inputTapSleep 850 1300 1 # 5th Formation
+            inputTapSleep 730 1800 1 # Use Formation
+            inputTapSleep 700 1240 1 # Confirm
             ;;
         "6")
-            inputTapSleep 970 1820 1  # Formations
-            inputTapSleep 800 1600 1  # Popular
-            inputTapSleep 850 1480 1  # 6th Formation
-            inputTapSleep 730 1800 1  # Use Formation
-            inputTapSleep 700 1240 1  # Confirm
+            inputTapSleep 970 1820 1 # Formations
+            inputTapSleep 800 1600 1 # Popular
+            inputTapSleep 850 1480 1 # 6th Formation
+            inputTapSleep 730 1800 1 # Use Formation
+            inputTapSleep 700 1240 1 # Confirm
             ;;
         esac
         ;;
@@ -1027,8 +1029,8 @@ chooseFormation(){
 # ##############################################################################
 arenaOfHeroes() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes" >&2; fi
-    inputTapSleep 740 1050 3    # Arena of Heroes
-    inputTapSleep 550 80 2      # Collect Arena Tickets
+    inputTapSleep 740 1050 3 # Arena of Heroes
+    inputTapSleep 550 80 2   # Collect Arena Tickets
     if [ "$pvpEventsActive" = "0" ]; then
         inputTapSleep 550 450 3 # Arena of Heroes
     elif [ "$pvpEventsActive" = "1" ]; then
@@ -1194,7 +1196,7 @@ arenaOfHeroes_tapClosestOpponent() {
         ;;
     3)
         if testColorOR -d "$DEFAULT_DELTA" 820 870 2eaab4; then # Check if opponent 2 exists
-            inputTapSleep 820 870 0                                    # Fight opponent
+            inputTapSleep 820 870 0                             # Fight opponent
         else
             arenaOfHeroes_tapClosestOpponent 2 # Try to fight the closest opponent to 3
         fi
@@ -1208,7 +1210,7 @@ arenaOfHeroes_tapClosestOpponent() {
         ;;
     5)
         if testColorOR -d "$DEFAULT_DELTA" 820 1220 2daab4; then # Check if opponent 4 exists
-            inputTapSleep 820 1220 0                                    # Fight opponent
+            inputTapSleep 820 1220 0                             # Fight opponent
         else
             arenaOfHeroes_tapClosestOpponent 4 # Try to fight the closest opponent to 5
         fi
@@ -1296,8 +1298,8 @@ kingsTower_battle() {
             # Check if win or lose battle
             if [ "$battleFailed" = false ]; then
                 _battle_WIN=$((_battle_WIN + 1)) # Increment
-                inputTapSleep 550 1850 4                               # Collect
-                inputTapSleep 550 170                                  # Tap on the top to close possible limited offer
+                inputTapSleep 550 1850 4         # Collect
+                inputTapSleep 550 170            # Tap on the top to close possible limited offer
 
                 # WARN: Limited offers might screw this up. Tapping 550 170 might close an offer.
                 # Tap top of the screen to close any possible Limited Offers
@@ -1343,9 +1345,9 @@ legendsTournament() {
     ## End of testing ##
 
     if [ "$pvpEventsActive" = "0" ]; then
-        inputTapSleep 550 900    # Legend's Challenger Tournament
+        inputTapSleep 550 900 # Legend's Challenger Tournament
     elif [ "$pvpEventsActive" = "1" ]; then
-        inputTapSleep 550 1450   # Legend's Challenger Tournament
+        inputTapSleep 550 1450 # Legend's Challenger Tournament
     else
         inputTapSleep 550 1800 3 # Legend's Challenger Tournament
     fi
@@ -1452,7 +1454,7 @@ fountainOfTime() {
 # Descripton    : Pushes campaign using popular formations
 # Remark        : Loops until you manually exit script.
 # ##############################################################################
-pushKingsTower(){
+pushKingsTower() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushKingsTower" >&2; fi
     if $doUsePopularFormations; then
         _popularFormation=1
@@ -1510,7 +1512,7 @@ pushKingsTower(){
                     push "KT" "Own"
                 done
                 _ownFormation=$((_ownFormation + 1)) # Increment formation
-                _own_battle_COUNT=0       # Reset loss counter
+                _own_battle_COUNT=0                  # Reset loss counter
             done
         fi
 
@@ -1525,7 +1527,7 @@ pushKingsTower(){
                     push "KT" "Popular"
                 done
                 _popularFormation=$((_popularFormation + 1)) # Increment formation
-                _popular_battle_COUNT=0           # Reset counter back to zero
+                _popular_battle_COUNT=0                      # Reset counter back to zero
             done
         fi
 
@@ -1601,15 +1603,15 @@ buyFromStore() {
     # Fuck all that just do Quick Buy
     if testColorOR -d "5" 860 720 fad8a5; then
         until [ "$_store_purchase_COUNT" -ge "$storeRefreshes" ]; do
-            inputTapSleep 940 720   # Quick Buy
-            inputTapSleep 720 1220  # Purchase
-            inputTapSleep 550 1700 2 # Close popup
+            inputTapSleep 940 720                                # Quick Buy
+            inputTapSleep 720 1220                               # Purchase
+            inputTapSleep 550 1700 2                             # Close popup
             _store_purchase_COUNT=$((_store_purchase_COUNT + 1)) # Increment
             if [ "$_store_purchase_COUNT" -lt "$storeRefreshes" ]; then
                 inputTapSleep 1000 290 # Refresh
                 inputTapSleep 700 1270 # Confirm
             fi
-            
+
         done
     else
         printInColor INFO "Quick Buy not found."
@@ -1755,7 +1757,7 @@ buyFromStore_test() {
 # ##############################################################################
 guildHunts() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "guildHunts" >&2; fi
-    inputTapSleep 300 600 10      # Guild
+    inputTapSleep 300 600 10 # Guild
 
     # Check for fortune chest
     if testColorOR 380 500 8e4633; then
@@ -1764,7 +1766,7 @@ guildHunts() {
     fi
     wait
 
-    inputTapSleep 290 860 3       # Guild Hunting
+    inputTapSleep 290 860 3 # Guild Hunting
     printInColor "INFO" "Fighting Wrizz ${cCyan}$totalAmountGuildBossTries${cNc} time(s)."
     guildHunts_quickBattle
     inputTapSleep 970 890 1              # Soren
@@ -1949,8 +1951,8 @@ templeOfAscension() {
 # ##############################################################################
 twistedRealmBoss() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "twistedRealmBoss ${cPurple}$*${cNc}" >&2; fi
-    if [ "$1" = true ]; then # Check if starting from tab or already inside activity
-        inputTapSleep 300 600 10      # Guild
+    if [ "$1" = true ]; then     # Check if starting from tab or already inside activity
+        inputTapSleep 300 600 10 # Guild
     fi
     ## For testing only! Keep as comment ##
     # inputTapSleep 380 360 10
@@ -2141,19 +2143,19 @@ collectMerchants() {
 
     # Check for Monthly Card
     if testColorOR -d "$DEFAULT_DELTA" 342 849 cd0000; then # Red exclamation mark
-        inputTapSleep 270 950 1 # Monthly Card Chest
-        inputTapSleep 550 300 1 # Collect rewards
+        inputTapSleep 270 950 1                             # Monthly Card Chest
+        inputTapSleep 550 300 1                             # Collect rewards
         sleep 2
     fi
 
     # Check for Deluxe Monthly Card
     if testColorOR -d "$DEFAULT_DELTA" 895 849 d10000; then # Red exclamation mark
-        inputTapSleep 820 950 1 # Deluxe Monthly Card Chest
-        inputTapSleep 550 300 1 # Collect rewards
+        inputTapSleep 820 950 1                             # Deluxe Monthly Card Chest
+        inputTapSleep 550 300 1                             # Collect rewards
         sleep 2
     fi
     inputTapSleep 780 1820 2 # Merchant Ship
-    
+
     # Check for "Specials" freebie
     if testColorOR -d "$DEFAULT_DELTA" 365 740 ce0101; then
         inputTapSleep 210 945 1 # Free
