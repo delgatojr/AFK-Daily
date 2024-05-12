@@ -815,7 +815,7 @@ lootAfkChest() {
 # ##############################################################################
 # Function Name : pushCampaign
 # Descripton    : Pushes campaign using popular formations
-# Remark        : Breaks on boss battles (every 4 fights).
+# Remark        : Loops until you manually exit script.
 # ##############################################################################
 pushCampaign(){
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushCampaign" >&2; fi
@@ -1435,8 +1435,7 @@ teamBounties() {
 # ##############################################################################
 # Function Name : pushKingsTower
 # Descripton    : Pushes campaign using popular formations
-# Remark        : Works best if you set formations in King's Tower beforehand.
-#                 Loops until you manually exit script.
+# Remark        : Loops until you manually exit script.
 # ##############################################################################
 pushKingsTower(){
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushKingsTower" >&2; fi
