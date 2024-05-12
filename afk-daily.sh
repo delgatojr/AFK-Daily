@@ -2185,7 +2185,6 @@ collectMerchants() {
     verifyHEX 20 1775 d49a61 "Attempted to collect merchant freebies." "Failed to collect merchant freebies."
 }
 
-
 # ##############################################################################
 # Section       : Test
 # ##############################################################################
