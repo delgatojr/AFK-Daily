@@ -1438,7 +1438,7 @@ teamBounties() {
 # Descripton    : Collects the Fountain of Time rewards.
 # ##############################################################################
 fountainOfTime() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fountainOfTime ${cPurple}$*${cNc}" >&2; fi
+    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fountainOfTime" >&2; fi
     inputTapSleep 800 700 4  # Temporal Rift
     inputTapSleep 250 1350 2 # Fountain of Time
     inputTapSleep 730 1360 2 # Collect
