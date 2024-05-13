@@ -557,16 +557,14 @@ switchTab() {
         fi
         ;;
     "Dark Forest")
-        if
-            [ "${2:-false}" = true ] ||
-                [ "$doSoloBounties" = true ] ||
-                [ "$doTeamBounties" = true ] ||
-                [ "$doArenaOfHeroes" = true ] ||
-                [ "$doLegendsTournament" = true ] ||
-                [ "$doKingsTower" = true ]
+        if [ "${2:-false}" = true ] ||
+            [ "$doSoloBounties" = true ] ||
+            [ "$doTeamBounties" = true ] ||
+            [ "$doArenaOfHeroes" = true ] ||
+            [ "$doLegendsTournament" = true ] ||
+            [ "$doKingsTower" = true ] ||
             [ "$doFountainOfTime" = true ] ||
-                [ "$doPushKingsTower" = true ]
-        then
+            [ "$doPushKingsTower" = true ]; then
             inputTapSleep 300 1850 2
             inputTapSleep 300 1850
             activeTab="$1"
@@ -641,7 +639,7 @@ waitBattleStart() {
         sleep .5
         # In case none were found, try again starting with the pause button
     done
-    sleep 1
+    sleep 2
 }
 
 # ##############################################################################
@@ -1039,7 +1037,7 @@ arenaOfHeroes() {
         inputTapSleep 550 1400 3 # Arena of Heroes
     fi
     if testColorOR -d "$DEFAULT_DELTA" 1050 1770 e72707; then # Red mark? old value: e52505 (d=5), fb1e0d (d=5)
-        inputTapSleep 1000 1800                               # Record
+        inputTapSleep 1000 1800 3                             # Record
         inputTapSleep 980 410                                 # Close
     fi
     inputTapSleep 540 1800 # Challenge
@@ -1111,7 +1109,7 @@ arenaOfHeroes() {
                     inputTapSleep 550 1850 0 # Battle
                     waitBattleStart
                     doSkip
-                    waitBattleFinish 2
+                    waitBattleFinish 3
                     if [ "$battleFailed" = false ]; then
                         inputTapSleep 550 1550                         # Collect
                         _arenaOfHeroes_WIN=$((_arenaOfHeroes_WIN + 1)) # Increment
