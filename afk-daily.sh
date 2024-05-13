@@ -2141,23 +2141,23 @@ collectMerchants() {
 
     # Check for Monthly Card
     if testColorOR -d "$DEFAULT_DELTA" 342 849 cd0000; then # Red exclamation mark
-        inputTapSleep 270 950 1                             # Monthly Card Chest
-        inputTapSleep 550 300 1                             # Collect rewards
+        inputTapSleep 270 950                               # Monthly Card Chest
+        inputTapSleep 550 300                               # Collect rewards
         sleep 2
     fi
 
     # Check for Deluxe Monthly Card
     if testColorOR -d "$DEFAULT_DELTA" 895 849 d10000; then # Red exclamation mark
-        inputTapSleep 820 950 1                             # Deluxe Monthly Card Chest
-        inputTapSleep 550 300 1                             # Collect rewards
+        inputTapSleep 820 950                               # Deluxe Monthly Card Chest
+        inputTapSleep 550 300                               # Collect rewards
         sleep 2
     fi
     inputTapSleep 780 1820 2 # Merchant Ship
 
     # Check for "Specials" freebie
     if testColorOR -d "$DEFAULT_DELTA" 365 740 ce0101; then
-        inputTapSleep 210 945 1 # Free
-        inputTapSleep 550 300 1 # Collect rewards
+        inputTapSleep 210 945 # Free
+        inputTapSleep 550 300 # Collect rewards
     else
         printInColor "INFO" "No 'Specials' reward to collect. [Tile]"
     fi
@@ -2166,11 +2166,11 @@ collectMerchants() {
     if testColorOR -d "$DEFAULT_DELTA" 345 1521 fe2108; then
         inputTapSleep 280 1625 2
         if testColorOR -d "$DEFAULT_DELTA" 365 515 d20101; then
-            inputTapSleep 210 720 1 # Free
-            inputTapSleep 550 300 1 # Collect rewards
+            inputTapSleep 210 720 # Free
+            inputTapSleep 550 300 # Collect rewards
         elif testColorOR -d "$DEFAULT_DELTA" 365 1000 cc0101; then
-            inputTapSleep 210 1200 1 # Free
-            inputTapSleep 550 300 1  # Collect rewards
+            inputTapSleep 210 1200 # Free
+            inputTapSleep 550 300  # Collect rewards
         else
             printInColor "INFO" "No 'Daily Deals' reward to collect. [Tile]"
         fi
@@ -2180,13 +2180,13 @@ collectMerchants() {
 
     # Check for "Biweeklies" freebie
     if testColorOR -d "$DEFAULT_DELTA" 520 1521 ff2209; then
-        inputTapSleep 455 1625 1
+        inputTapSleep 455 1625
         if testColorOR -d "$DEFAULT_DELTA" 365 515 d20101; then
-            inputTapSleep 210 720 1 # Free
-            inputTapSleep 550 300 1 # Collect rewards
+            inputTapSleep 210 720 # Free
+            inputTapSleep 550 300 # Collect rewards
         elif testColorOR -d "$DEFAULT_DELTA" 365 1475 d70000; then
-            inputTapSleep 210 1480 1 # Free
-            inputTapSleep 550 300 1  # Collect rewards
+            inputTapSleep 210 1480 # Free
+            inputTapSleep 550 300  # Collect rewards
         else
             printInColor "INFO" "No 'Biweeklies' reward to collect. [Tile]"
         fi
