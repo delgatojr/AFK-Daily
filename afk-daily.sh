@@ -611,7 +611,7 @@ waitBattleFinish() {
         if testColorOR -f 560 350 b8894d b7894c; then # Victory
             battleFailed=false
             finished=true
-        elif [ "$HEX" = '171932' ] || [ "$HEX" = "171b36" ]; then # Failed & Failed in Challenger Tournament
+        elif [ "$HEX" = '171932' ] || [ "$HEX" = "171d3c" ]; then # Failed & Failed in Challenger Tournament
             battleFailed=true
             finished=true
         # First HEX local device, second bluestacks
