@@ -1396,9 +1396,25 @@ legendsTournament() {
 # ##############################################################################
 soloBounties() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "soloBounties" >&2; fi
+    finished=false
     inputTapSleep 600 1320 2
     inputTapSleep 650 1700 1 # Solo Bounty
     inputTapSleep 780 1550 1 # Collect all
+
+    # Check once before scrolling down
+    dispatchBounties 1
+    inputSwipe 550 1400 550 400 500 # Scroll Down
+    sleep 1
+    until $finished; do
+        dispatchBounties 2
+        if [ "$_gold" -gt 1 ]; then
+            inputTapSleep 110 250 1  # Refresh
+            inputTapSleep 700 1260 1 # Confirm
+            inputSwipe 550 1400 550 400 500 # Scroll Down
+        else
+            finished=true
+        fi
+    done
     inputTapSleep 350 1550   # Dispatch all
     inputTapSleep 550 1500 0 # Confirm
 
@@ -1411,6 +1427,108 @@ soloBounties() {
         verifyHEX 650 1740 a7541a "Collected/dispatched solo bounties." "Failed to collect/dispatch solo bounties."
     fi
 }
+
+# ##############################################################################
+# Function Name : dispatchBounties
+# Descripton    : Dispatches non-gold bounties.
+# ##############################################################################
+dispatchBounties (){
+    _gold=0
+    if [ "$1" = 1 ]; then # Pre Scroll Down
+        # Check 1st Item
+        dispatchBounties_nonGold 110 465 faeb9a
+        # Check 2nd Item
+        dispatchBounties_nonGold 110 675 fcf3a3
+        # Check 3rd Item
+        dispatchBounties_nonGold 110 885 fcf8a8
+        # Check 4th Item
+        dispatchBounties_nonGold 110 1095 fbfaab
+        # Check 5th Item
+        dispatchBounties_nonGold 110 1305 fafaac
+        echo "$_gold"
+    elif [ "$1" = 2 ]; then # Scrolled Down
+        # Check 1st Item
+        dispatchBounties_nonGold 110 535 fcf09f
+        # Check 2nd Item
+        dispatchBounties_nonGold 110 745 fcf5a4
+        # Check 3rd Item
+        dispatchBounties_nonGold 110 955 fcfaaa
+        # Check 4th Item
+        dispatchBounties_nonGold 110 1165 fbfaac
+        # Check 5th Item
+        dispatchBounties_nonGold 110 1375 fafaad
+        echo "$_gold"
+    fi
+}
+
+
+# ##############################################################################
+# Function Name : dispatchBounty
+# Descripton    : Dispatches a single bounty.
+# ##############################################################################
+dispatchBounties_nonGold (){
+    x="$1"
+    x=$((x + 800)) # Move Right to Dispatch Button
+    y="$2"
+    if testColorNAND -d "$DEFAULT_DELTA" -f "$1" "$2" "$3"; then # Not Gold
+        if testColorNAND -d "$DEFAULT_DELTA" -f "$x" "$y" ba9a6d; then # Not Dispatched yet
+            dispatchBounties_nonGold_Autofill "$1" "$2"
+        fi
+    else
+        _gold=$((_gold + 1)) # Increment
+    fi
+}
+
+# ##############################################################################
+# Function Name : dispatchBounties_nonGold_Autofill
+# Descripton    : Autofills the bounty.
+# ##############################################################################
+dispatchBounties_nonGold_Autofill (){
+    x="$1"
+    x=$((x + 800)) # Move Right to Dispatch Button
+    y="$2"
+    inputTapSleep "$x" "$y" 1 # Dispatch
+    inputTapSleep 350 1170 1 # Autofill
+    inputTapSleep 740 1170 1 # Dispatch
+}
+
+
+
+# _oakInn_TRIES=0
+#     _oakInn_TRIES_MAX=3
+#     _oakInn_X_START=230
+#     _oakInn_X_END=855
+#     until [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; do
+#         until [ "$_oakInn_X_START" -ge "$_oakInn_X_END" ]; do
+#             # Tap on X coord to possibly collect present
+#             inputTapSleep "$_oakInn_X_START" 1350
+
+#             # Check if tapped on present
+#             if testColorNAND 955 1235 271616; then
+#                 inputTapSleep 540 1650 1  # Ok
+#                 inputTapSleep 540 1650 .5 # Collect reward
+#                 printInColor "INFO" "Collected presents at the Oak Inn."
+#                 break 2
+#             fi
+
+#             # Increment
+#             _oakInn_X_START=$((_oakInn_X_START + 70))
+#         done
+
+#         _oakInn_X_START=230                  # Reset
+#         _oakInn_TRIES=$((_oakInn_TRIES + 1)) # Increment
+
+#         # If no present collected, warn user
+#         if [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; then
+#             printInColor "WARN" "No presents collected at the Oak Inn."
+#         fi
+#     done
+
+
+
+
+
+
 
 # ##############################################################################
 # Function Name : teamBounties
