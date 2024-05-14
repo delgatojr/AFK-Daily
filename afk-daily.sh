@@ -1442,8 +1442,16 @@ fountainOfTime() {
     inputTapSleep 800 700 4  # Temporal Rift
     inputTapSleep 250 1350 2 # Fountain of Time
     inputTapSleep 730 1360 2 # Collect
-    inputTapSleep 70 1810    # Return
-    inputTapSleep 70 1810    # Return
+    inputTapSleep 550 75     # Tap Away Rewards
+    # if testColorOR 550 300 debd62; then # Level Up
+    if testColorOR 550 300 debd62; then # Level Up
+        inputTapSleep 550 75            # Tap top of the screen to close pop-up
+        printInColor INFO "Level Up!"
+        if testColorNAND 550 200 1f2438; then # "Newly Unlocked Beacons"
+            inputTapSleep 550 75              # Tap top of the screen to close pop-up
+        fi
+    fi
+    inputTapSleep 70 1810 # Return
     verifyHEX 240 1775 d49a61 "Collected Fountain of Time." "Failed to collect Fountain of Time."
 }
 
