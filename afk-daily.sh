@@ -1974,37 +1974,28 @@ oakInn() {
     printInColor "INFO" "Searching for presents to collect..."
 
     _oakInn_TRIES=0
-    _oakInn_TRIES_MAX=3
-    _oakInn_X_START=230
-    _oakInn_X_END=855
+    _oakInn_TRIES_MAX=10
+
+    inputSwipe 950 1700 950 100 300 # Swipe to the bottoms
+    sleep 2
     until [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; do
-        until [ "$_oakInn_X_START" -ge "$_oakInn_X_END" ]; do
-            # Tap on X coord to possibly collect present
-            inputTapSleep "$_oakInn_X_START" 1350
-
-            # Check if tapped on present
-            if testColorNAND 955 1235 271616; then
-                inputTapSleep 540 1650 1  # Ok
-                inputTapSleep 540 1650 .5 # Collect reward
-                printInColor "INFO" "Collected presents at the Oak Inn."
-                break 2
-            fi
-
-            # Increment
-            _oakInn_X_START=$((_oakInn_X_START + 70))
-        done
-
-        _oakInn_X_START=230                  # Reset
-        _oakInn_TRIES=$((_oakInn_TRIES + 1)) # Increment
-
+        inputTapSleep 240 1185 # Click Present
+        # Check if tapped on present
+        if testColorOR 955 1235 eadcb6; then
+            inputTapSleep 550 1650 # Collect Reward
+            inputTapSleep 540 1650 # Tap Reward Screen
+            printInColor "INFO" "Collected presents at the Oak Inn."
+            break
+        fi
         # If no present collected, warn user
         if [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; then
             printInColor "WARN" "No presents collected at the Oak Inn."
         fi
+        _oakInn_TRIES=$((_oakInn_TRIES + 1)) # Increment
     done
-    inputTapSleep 70 1810 0
 
-    wait
+    inputTapSleep 70 1810 3 # Return
+
     verifyHEX 20 1775 d49a61 \
         "Attempted to collect Oak Inn presents." \
         "Failed to collect Oak Inn presents."
@@ -2254,7 +2245,7 @@ collectMail() {
 # ##############################################################################
 collectMerchants() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectMerchants" >&2; fi
-    inputTapSleep 120 300 10 # Merchants
+    inputTapSleep 120 300 7 # Merchants
     # WARN: Breaks if a pop-up message shows up
 
     # Check for Monthly Card
