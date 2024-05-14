@@ -1873,6 +1873,7 @@ oakInn() {
         if [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; then
             printInColor "WARN" "No presents collected at the Oak Inn."
         fi
+        _oakInn_TRIES=$((_oakInn_TRIES + 1)) # Increment
     done
 
     inputTapSleep 70 1810 3 # Return
