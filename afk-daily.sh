@@ -1864,7 +1864,7 @@ oakInn() {
         inputTapSleep 240 1185 # Click Present
         # Check if tapped on present
         if testColorOR 955 1235 eadcb6; then
-            inputTapSleep 550 1250 # Collect Reward
+            inputTapSleep 550 1650 # Collect Reward
             inputTapSleep 540 1650 # Tap Reward Screen
             printInColor "INFO" "Collected presents at the Oak Inn."
             break
