@@ -618,6 +618,10 @@ waitBattleFinish() {
         elif [ "$HEX" = "45331d" ] || [ "$HEX" = "44331c" ]; then # Victory with reward
             battleFailed=false
             finished=true
+        # Win in Arena of Heroes with Reward
+        elif testColorOR -f 550 696 fff085; then
+            battleFailed=false
+            finished=true
         fi
         sleep 1
     done
