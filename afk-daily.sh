@@ -2127,7 +2127,7 @@ collectMail() {
 # ##############################################################################
 collectMerchants() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectMerchants" >&2; fi
-    inputTapSleep 120 300 10 # Merchants
+    inputTapSleep 120 300 7 # Merchants
     # WARN: Breaks if a pop-up message shows up
 
     # Check for Monthly Card
