@@ -1405,22 +1405,27 @@ soloBounties() {
     inputTapSleep 650 1700 1 # Solo Bounty
     inputTapSleep 780 1550 1 # Collect all
 
-    # Check once before scrolling down
-    dispatchBounties 1
-    inputSwipe 550 1400 550 400 500 # Scroll Down
-    sleep 1
-    until $finished; do
-        dispatchBounties 2
-        if [ "$_gold" -gt 1 ]; then
-            inputTapSleep 110 250 1  # Refresh
-            inputTapSleep 700 1260 1 # Confirm
-            inputSwipe 550 1400 550 400 500 # Scroll Down
-        else
-            finished=true
+    if testColorOR -d "$DEFAULT_DELTA" -f 337 1550 ffffff; then # Bounties waiting to be dispatched
+        # Check once before scrolling down
+        dispatchBounties 1
+        inputSwipe 550 1400 550 400 500 # Scroll Down
+        sleep 1
+        until $finished; do
+            dispatchBounties 2
+            if [ "$_gold" -gt "$maxGold" ]; then
+                inputTapSleep 110 250 1         # Refresh
+                inputTapSleep 700 1260 1        # Confirm
+                inputSwipe 550 1400 550 400 500 # Scroll Down
+            else
+                finished=true
+            fi
+            _gold=0
+        done
+        if testColorOR -d "$DEFAULT_DELTA" -f 337 1550 ffffff; then # Bounties waiting to be dispatched
+            inputTapSleep 350 1550                                  # Dispatch all
+            inputTapSleep 550 1500 0                                # Confirm
         fi
-    done
-    inputTapSleep 350 1550   # Dispatch all
-    inputTapSleep 550 1500 0 # Confirm
+    fi
 
     if [ "$doTeamBounties" = false ]; then # Return to Tab if $doTeamBounties = false
         wait
@@ -1435,9 +1440,9 @@ soloBounties() {
 # ##############################################################################
 # Function Name : dispatchBounties
 # Descripton    : Dispatches non-gold bounties.
+# Args          : <NUMBER>: 1 for pre scroll down, 2 for after.
 # ##############################################################################
-dispatchBounties (){
-    _gold=0
+dispatchBounties() {
     if [ "$1" = 1 ]; then # Pre Scroll Down
         # Check 1st Item
         dispatchBounties_nonGold 110 465 faeb9a
@@ -1465,16 +1470,16 @@ dispatchBounties (){
     fi
 }
 
-
 # ##############################################################################
 # Function Name : dispatchBounty
 # Descripton    : Dispatches a single bounty.
+# Args          : <X> <Y>
 # ##############################################################################
-dispatchBounties_nonGold (){
+dispatchBounties_nonGold() {
     x="$1"
     x=$((x + 800)) # Move Right to Dispatch Button
     y="$2"
-    if testColorNAND -d "$DEFAULT_DELTA" -f "$1" "$2" "$3"; then # Not Gold
+    if testColorNAND -d "$DEFAULT_DELTA" -f "$1" "$2" "$3"; then       # Not Gold
         if testColorNAND -d "$DEFAULT_DELTA" -f "$x" "$y" ba9a6d; then # Not Dispatched yet
             dispatchBounties_nonGold_Autofill "$1" "$2"
         fi
@@ -1486,53 +1491,16 @@ dispatchBounties_nonGold (){
 # ##############################################################################
 # Function Name : dispatchBounties_nonGold_Autofill
 # Descripton    : Autofills the bounty.
+# Args          : <X> <Y>
 # ##############################################################################
-dispatchBounties_nonGold_Autofill (){
+dispatchBounties_nonGold_Autofill() {
     x="$1"
     x=$((x + 800)) # Move Right to Dispatch Button
     y="$2"
     inputTapSleep "$x" "$y" 1 # Dispatch
-    inputTapSleep 350 1170 1 # Autofill
-    inputTapSleep 740 1170 1 # Dispatch
+    inputTapSleep 350 1170 1  # Autofill
+    inputTapSleep 740 1170 1  # Dispatch
 }
-
-
-
-# _oakInn_TRIES=0
-#     _oakInn_TRIES_MAX=3
-#     _oakInn_X_START=230
-#     _oakInn_X_END=855
-#     until [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; do
-#         until [ "$_oakInn_X_START" -ge "$_oakInn_X_END" ]; do
-#             # Tap on X coord to possibly collect present
-#             inputTapSleep "$_oakInn_X_START" 1350
-
-#             # Check if tapped on present
-#             if testColorNAND 955 1235 271616; then
-#                 inputTapSleep 540 1650 1  # Ok
-#                 inputTapSleep 540 1650 .5 # Collect reward
-#                 printInColor "INFO" "Collected presents at the Oak Inn."
-#                 break 2
-#             fi
-
-#             # Increment
-#             _oakInn_X_START=$((_oakInn_X_START + 70))
-#         done
-
-#         _oakInn_X_START=230                  # Reset
-#         _oakInn_TRIES=$((_oakInn_TRIES + 1)) # Increment
-
-#         # If no present collected, warn user
-#         if [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; then
-#             printInColor "WARN" "No presents collected at the Oak Inn."
-#         fi
-#     done
-
-
-
-
-
-
 
 # ##############################################################################
 # Function Name : teamBounties
