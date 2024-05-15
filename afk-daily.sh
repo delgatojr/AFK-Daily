@@ -943,7 +943,7 @@ push() {
         _total_LOSS=$((_total_LOSS + 1)) # Increment
     fi
     # if not at battle screen reset game.
-    if testColorNAND 550 1120 deba85; then
+    if testColorNAND 635 1350 eacc96; then
         printInColor "ERROR" "Not at Battle Screen. Resetting Game."
         init
         run
