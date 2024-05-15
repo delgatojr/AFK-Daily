@@ -1531,7 +1531,6 @@ fountainOfTime() {
     inputTapSleep 250 1350 2 # Fountain of Time
     inputTapSleep 730 1360 2 # Collect
     inputTapSleep 550 75     # Tap Away Rewards
-    # if testColorOR 550 300 debd62; then # Level Up
     if testColorOR 550 300 debd62; then # Level Up
         inputTapSleep 550 75            # Tap top of the screen to close pop-up
         printInColor INFO "Level Up!"
