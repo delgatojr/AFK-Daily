@@ -1454,7 +1454,6 @@ dispatchBounties() {
         dispatchBounties_nonGold 110 1095 fbfaab
         # Check 5th Item
         dispatchBounties_nonGold 110 1305 fafaac
-        echo "$_gold"
     elif [ "$1" = 2 ]; then # Scrolled Down
         # Check 1st Item
         dispatchBounties_nonGold 110 535 fcf09f
@@ -1466,7 +1465,6 @@ dispatchBounties() {
         dispatchBounties_nonGold 110 1165 fbfaac
         # Check 5th Item
         dispatchBounties_nonGold 110 1375 fafaad
-        echo "$_gold"
     fi
 }
 
