@@ -2164,7 +2164,7 @@ collectQuestChests() {
     done
 
     inputTapSleep 70 1650 2 # Return
-    verifyHEX 20 1775 54331a "Collected daily and weekly quest chests." "Failed to collect daily and weekly quest chests."
+    verifyHEX 20 1775 d49a61 "Collected daily and weekly quest chests." "Failed to collect daily and weekly quest chests."
 }
 
 # ##############################################################################
