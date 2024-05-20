@@ -23,7 +23,7 @@ DEBUG=0
 DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
 eventHoe=false  # Set to `true` if "Heroes of Esperia" event is live
-eventTs=true    # Set to `true` if "Treasure Scramble" event is live
+eventTs=false    # Set to `true` if "Treasure Scramble" event is live
 eventTv=true    # Set to `true` if "Treasure Vanguard" event is live
 totalAmountOakRewards=3
 
