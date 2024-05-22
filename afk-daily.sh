@@ -23,7 +23,7 @@ DEBUG=0
 DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
 eventHoe=false  # Set to `true` if "Heroes of Esperia" event is live
-eventTs=false    # Set to `true` if "Treasure Scramble" event is live
+eventTs=false   # Set to `true` if "Treasure Scramble" event is live
 eventTv=true    # Set to `true` if "Treasure Vanguard" event is live
 totalAmountOakRewards=3
 
@@ -1031,6 +1031,7 @@ chooseFormation() {
 # ##############################################################################
 arenaOfHeroes() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes" >&2; fi
+    pvpEvents                # Counts number of Active pvp events
     inputTapSleep 740 1050 3 # Arena of Heroes
     inputTapSleep 550 80 2   # Collect Arena Tickets
     if [ "$pvpEventsActive" = "0" ]; then
@@ -1527,10 +1528,10 @@ teamBounties() {
 # ##############################################################################
 fountainOfTime() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fountainOfTime" >&2; fi
-    inputTapSleep 800 700 4  # Temporal Rift
-    inputTapSleep 250 1350 2 # Fountain of Time
-    inputTapSleep 730 1360 2 # Collect
-    inputTapSleep 550 75     # Tap Away Rewards
+    inputTapSleep 800 700 4             # Temporal Rift
+    inputTapSleep 250 1350 2            # Fountain of Time
+    inputTapSleep 730 1360 2            # Collect
+    inputTapSleep 550 75                # Tap Away Rewards
     if testColorOR 550 300 debd62; then # Level Up
         inputTapSleep 550 75            # Tap top of the screen to close pop-up
         printInColor INFO "Level Up!"
