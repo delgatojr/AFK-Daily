@@ -22,7 +22,7 @@ DEBUG=0
 # DEBUG >= 9    Show tap calls
 DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
-eventHoe=false  # Set to `true` if "Heroes of Esperia" event is live
+eventHoe=true  # Set to `true` if "Heroes of Esperia" event is live
 eventTs=false   # Set to `true` if "Treasure Scramble" event is live
 eventTv=true    # Set to `true` if "Treasure Vanguard" event is live
 totalAmountOakRewards=3
@@ -1851,7 +1851,9 @@ buyFromStore_test() {
 # ##############################################################################
 guildHunts() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "guildHunts" >&2; fi
-    inputTapSleep 300 600 10 # Guild
+    
+    # Open Guild
+    inputTapSleep 300 600 10
 
     # Check for fortune chest
     if testColorOR 380 500 8e4633; then
@@ -1860,25 +1862,29 @@ guildHunts() {
     fi
     wait
 
-    inputTapSleep 290 860 3 # Guild Hunting
-    printInColor "INFO" "Fighting Wrizz ${cCyan}$totalAmountGuildBossTries${cNc} time(s)."
+    # Open Guild Hunting
+    inputTapSleep 290 860 3 #
+    printInColor "INFO" "Fighting Wrizz."
     guildHunts_quickBattle
+
+    # Check and handle Soren battle
     inputTapSleep 970 890 1              # Soren
     if testColorOR 715 1815 8ae5c4; then # If Soren is open
-        printInColor "INFO" "Fighting Soren ${cCyan}$totalAmountGuildBossTries${cNc} time(s)."
+        printInColor "INFO" "Fighting Soren."
         guildHunts_quickBattle
-    elif [ "$canOpenSoren" = true ]; then # If Soren is closed
+    elif [ "$canOpenSoren" = true ]; then
         printInColor "INFO" "Soren is closed."
-        if testColorOR 580 1753 fae0ac; then # If soren is "openable"
+        if testColorOR 580 1753 fae0ac; then
             printInColor "INFO" "Oppening Soren."
             inputTapSleep 550 1850
             inputTapSleep 700 1250 1
-            printInColor "INFO" "Fighting Soren ${cCyan}$totalAmountGuildBossTries${cNc} time(s)."
+            printInColor "INFO" "Fighting Soren."
             guildHunts_quickBattle
         fi
     fi
 
-    if [ "$doTwistedRealmBoss" = false ]; then # Return to Tab if $doTwistedRealmBoss = false
+    # Return to Ranhorn if doTwistedRealmBoss is false
+    if [ "$doTwistedRealmBoss" = false ]; then
         inputTapSleep 70 1810 3
         inputTapSleep 70 1810 3
         verifyHEX 20 1775 d49a61 "Battled Wrizz and possibly Soren." "Failed to battle Wrizz and possibly Soren."
@@ -1890,32 +1896,29 @@ guildHunts() {
 
 # ##############################################################################
 # Function Name : guildHunts_quickBattle
-# Descripton    : Repeat a battle for as long as totalAmountGuildBossTries
+# Descripton    : Sweeps Quick Battles
 # Remark        : May break because "some resources have exceeded their maximum limit"
 # ##############################################################################
 guildHunts_quickBattle() {
     if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "guildHunts_quickBattle" >&2; fi
-    _guildHunts_quickBattle_COUNT=0
-    # Check if possible to fight wrizz to secure totalAmountGuildBossTries -> Grey: a1a1a1 / Blue: 9de8be
-    until [ "$_guildHunts_quickBattle_COUNT" -ge "$totalAmountGuildBossTries" ] || testColorOR 710 1840 a1a1a1; do
-        if [ "$guildBattleType" = "challenge" ]; then
-            inputTapSleep 350 1840   # Challenge
-            inputTapSleep 550 1850 0 # Battle
-            waitBattleStart
-            doAuto
-            doSpeed
-            waitBattleFinish 10     # Wait until battle is over
-            inputTapSleep 550 800 0 # Reward
-            inputTapSleep 550 800 1 # Reward x2
-        else
-            inputTapSleep 710 1840 # Quick Battle
-            # WARN: May break because "some resources have exceeded their maximum limit"
-            inputTapSleep 720 1300 1 # Begin
-            inputTapSleep 550 800 0  # Reward
-            inputTapSleep 550 800 1  # Reward x2
-        fi
-        _guildHunts_quickBattle_COUNT=$((_guildHunts_quickBattle_COUNT + 1)) # Increment
-    done
+
+    # Check if possible to fight Wrizz -> Grey: a1a1a1 / Blue: 9de8be
+    if [ "$guildBattleType" = "challenge" ]; then
+        inputTapSleep 350 1840   # Challenge
+        inputTapSleep 550 1850 0 # Battle
+        waitBattleStart
+        doAuto
+        doSpeed
+        waitBattleFinish 10     # Wait until battle is over
+        inputTapSleep 550 800 0 # Reward
+        inputTapSleep 550 800 1 # Reward x2
+    else
+        inputTapSleep 710 1840 # Quick Battle
+        # WARN: May break because "some resources have exceeded their maximum limit"
+        inputTapSleep 720 1300 1 # Begin
+        inputTapSleep 550 800 0  # Reward
+        inputTapSleep 550 800 1  # Reward x2
+    fi
 }
 
 # ##############################################################################
