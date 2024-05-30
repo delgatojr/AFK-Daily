@@ -1561,7 +1561,7 @@ dispatchBounties() {
     logDebug "dispatchBounties ${cPurple}$*${cNc}" 4 "ENTER"
 
     case "$1" in
-    1) # Pre Scroll Down
+    1)
         # Check and dispatch each bounty item in the pre-scroll down view
         dispatchBounties_nonGold 110 465 faeb9a  # Check 1st Item
         dispatchBounties_nonGold 110 675 fcf3a3  # Check 2nd Item
@@ -1569,7 +1569,7 @@ dispatchBounties() {
         dispatchBounties_nonGold 110 1095 fbfaab # Check 4th Item
         dispatchBounties_nonGold 110 1305 fafaac # Check 5th Item
         ;;
-    2) # Scrolled Down
+    2)
         # Check and dispatch each bounty item in the scrolled down view
         dispatchBounties_nonGold 110 535 fcf09f  # Check 1st Item
         dispatchBounties_nonGold 110 745 fcf5a4  # Check 2nd Item
