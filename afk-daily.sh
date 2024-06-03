@@ -30,8 +30,8 @@ DEFAULT_SLEEP=2 # equivalent to wait (default 2)
 
 # Event flags
 eventHoe=true # Set to `true` if "Heroes of Esperia" event is live
-eventTs=false # Set to `true` if "Treasure Scramble" event is live
-eventTv=true  # Set to `true` if "Treasure Vanguard" event is live
+eventTs=true # Set to `true` if "Treasure Scramble" event is live
+eventTv=false  # Set to `true` if "Treasure Vanguard" event is live
 
 # Script state variables (Do not modify)
 activeTab="Start"
