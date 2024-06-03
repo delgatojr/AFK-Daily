@@ -12,7 +12,10 @@
 # Section       : Variables
 # ##############################################################################
 # Probably you don't need to modify this. Do it if you know what you're doing, I won't blame you (unless you blame me).
+
+# Device settings
 DEVICEWIDTH=1080
+
 DEBUG=0
 # DEBUG  = 0    Show no debug
 # DEBUG >= 1    Show getColor calls > $HEX value
@@ -20,14 +23,17 @@ DEBUG=0
 # DEBUG >= 3    Show all core functions calls
 # DEBUG >= 4    Show all functions calls
 # DEBUG >= 9    Show tap calls
+
+# Default settings
 DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
-eventHoe=true  # Set to `true` if "Heroes of Esperia" event is live
-eventTs=false   # Set to `true` if "Treasure Scramble" event is live
-eventTv=true    # Set to `true` if "Treasure Vanguard" event is live
-totalAmountOakRewards=3
 
-# Do not modify
+# Event flags
+eventHoe=true # Set to `true` if "Heroes of Esperia" event is live
+eventTs=false # Set to `true` if "Treasure Scramble" event is live
+eventTv=true  # Set to `true` if "Treasure Vanguard" event is live
+
+# Script state variables (Do not modify)
 activeTab="Start"
 activeEvents=""
 currentPos="default"
@@ -68,6 +74,9 @@ while getopts "ce:fgi:l:s:tv:w" opt; do
             "hoe") eventHoe=true ;; # Heroes of Esperia
             "ts") eventTs=true ;;   # Treasure Scramble (same problem as HoE atm)
             "tv") eventTv=true ;;   # Treasure Vanguard (same problem as HoE atm)
+            *)
+                echo "Unknown event: $i" >&2
+                ;;
             esac
         done
         IFS=$buIFS
@@ -98,7 +107,11 @@ while getopts "ce:fgi:l:s:tv:w" opt; do
         forceWeekly=true
         ;;
     \?)
-        echo "$OPTARG : Invalid option"
+        echo "Invalid option: -$OPTARG" >&2
+        exit 1
+        ;;
+    :)
+        echo "Option -$OPTARG requires an argument." >&2
         exit 1
         ;;
     esac
@@ -164,7 +177,8 @@ disableOrientation() {
 # Args          : [<-f>] <X> <Y>
 # ##############################################################################
 getColor() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "getColor ${cPurple}$*${cNc}" >&2; fi
+    logDebug "getColor ${cPurple}$*${cNc}" 3 "ENTER"
+
     for arg in "$@"; do
         shift
         case "$arg" in
@@ -174,7 +188,8 @@ getColor() {
     done
     takeScreenshot
     readHEX "$1" "$2"
-    if [ "$DEBUG" -ge 1 ]; then printInColor "DEBUG" "getColor ${cPurple}$*${cNc} > HEX: ${cCyan}$HEX${cNc}" >&2; fi
+
+    logDebug "getColor ${cPurple}$*${cNc} > HEX: ${cCyan}$HEX${cNc}" 1 "EXIT"
 }
 
 # ##############################################################################
@@ -228,7 +243,7 @@ HEXColorDelta() {
         echo " 0 means similar colors, 100 means opposite colors" >&2
         return
     fi
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "HEXColorDelta ${cPurple}$*${cNc}" >&2; fi
+    logDebug "HEXColorDelta ${cPurple}$*${cNc}" 3
     r=$((0x${1:0:2} - 0x${2:0:2}))
     g=$((0x${1:2:2} - 0x${2:2:2}))
     b=$((0x${1:4:2} - 0x${2:4:2}))
@@ -243,9 +258,12 @@ HEXColorDelta() {
 # Args          : <X> <Y> <XEND> <YEND> <TIME>
 # ##############################################################################
 inputSwipe() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "inputSwipe ${cPurple}$*${cNc}" >&2; fi
+    logDebug "inputSwipe ${cPurple}$*${cNc}" 3 "ENTER"
+
     input touchscreen swipe "$1" "$2" "$3" "$4" "$5"
     screenshotRequired=true
+
+    logDebug "inputSwipe" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -254,10 +272,13 @@ inputSwipe() {
 # Args          : <X> <Y> [<SLEEP>]
 # ##############################################################################
 inputTapSleep() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "inputTapSleep ${cPurple}$*${cNc}" >&2; fi
+    logDebug "inputTapSleep ${cPurple}$*${cNc}" 9 "ENTER"
+
     input tap "$1" "$2"          # tap
     sleep "${3:-$DEFAULT_SLEEP}" # sleep
     screenshotRequired=true
+
+    logDebug "inputTapSleep" 9 "EXIT"
 }
 
 # ##############################################################################
@@ -266,12 +287,15 @@ inputTapSleep() {
 # Args          : <SLEEP> <X> <Y> <COLOR> [<COLOR> ...]
 # ##############################################################################
 loopUntilNotRGB() {
-    if [ "$DEBUG" -ge 2 ]; then printInColor "DEBUG" "loopUntilNotRGB ${cPurple}$*${cNc}" >&2; fi
+    logDebug "loopUntilNotRGB ${cPurple}$*${cNc}" 3 "ENTER"
+
     sleep "$1"
     shift
     until testColorNAND -f "$@"; do
         sleep 1
     done
+
+    logDebug "loopUntilRGB" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -280,12 +304,15 @@ loopUntilNotRGB() {
 # Args          : <SLEEP> <X> <Y> <COLOR> [<COLOR> ...]
 # ##############################################################################
 loopUntilRGB() {
-    if [ "$DEBUG" -ge 2 ]; then printInColor "DEBUG" "loopUntilRGB ${cPurple}$*${cNc}" >&2; fi
+    logDebug "loopUntilRGB ${cPurple}$*${cNc}" 3 "ENTER"
+
     sleep "$1"
     shift
     until testColorOR -f "$@"; do
         sleep 1
     done
+
+    logDebug "loopUntilRGB" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -299,25 +326,65 @@ printInColor() {
         echo " <TYPE>: DEBUG, DONE, ERROR, INFO, TEST, WARN" >&2
         return
     fi
-    if [ "$1" = "DEBUG" ]; then
-        msg="${cPurple}[DEBUG]${cNc} "
-    elif [ "$1" = "DONE" ]; then
-        msg="${cGreen}[DONE]${cNc}  "
-    elif [ "$1" = "ERROR" ]; then
-        msg="${cRed}[ERROR]${cNc} "
-    elif [ "$1" = "INFO" ]; then
-        msg="${cBlue}[INFO]${cNc}  "
-    elif [ "$1" = "WARN" ]; then
-        msg="${cYellow}[WARN]${cNc}  "
-    else
-        msg="        "
-    fi
+
+    case "$1" in
+    "DEBUG") msg="${cPurple}[DEBUG]${cNc} " ;;
+    "DONE") msg="${cGreen}[DONE]${cNc}  " ;;
+    "ERROR") msg="${cRed}[ERROR]${cNc} " ;;
+    "INFO") msg="${cBlue}[INFO]${cNc}  " ;;
+    "WARN") msg="${cYellow}[WARN]${cNc}  " ;;
+    *) msg="        " ;;
+    esac
+
     shift
     msg="$msg$1${cNc}" # The ${cNc} is a security if we forgot to reset color at the end of our message
+
     if [ "$withColors" = false ]; then
         msg=$(echo "$msg" | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g') # Source: https://stackoverflow.com/a/54648447
     fi
+
     echo "$msg"
+}
+
+# ##############################################################################
+# Function Name : logDebug
+# Description   : Logs debug messages based on the DEBUG level set.
+# Args          : <MESSAGE> <LOG_LEVEL> [<MESSAGE_TYPE>]
+#                   <MESSAGE>: The message to log.
+#                   <LOG_LEVEL>: The log level required to log the message.
+#                   <MESSAGE_TYPE>: Optional. "ENTER" or "EXIT".
+# Remarks       : This function will only log messages if the DEBUG level
+#                 is greater than or equal to the specified log level.
+# ##############################################################################
+
+logDebug() {
+    message="$1"
+    logLevel="${2:-1}" # Default log level for debug is 1
+    msgType="${3:-}"   # Optional. Message type, should be "ENTER" or "EXIT"
+
+    # Validate logLevel is an integer and greater than or equal to 1
+    if ! expr "$logLevel" : '^[1-9][0-9]*$' >/dev/null; then
+        logLevel=1
+    fi
+
+    # Determine log message based on msgType
+    case "$msgType" in
+    "ENTER")
+        logMessage="Entering: $message."
+        ;;
+    "EXIT")
+        logMessage="Exiting: $message"
+        ;;
+    *)
+        msgType=""
+        logMessage="$message"
+        ;;
+    esac
+
+    # Check if the current DEBUG level is high enough to log the message
+    if [ "$DEBUG" -ge "$logLevel" ]; then
+        printInColor "DEBUG" "$logMessage" >&2
+    fi
 }
 
 # ##############################################################################
@@ -357,10 +424,13 @@ startApp() {
 # Output        : $SCREENSHOTLOCATION
 # ##############################################################################
 takeScreenshot() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "takeScreenshot [screenshotRequired=${cCyan}$screenshotRequired${cNc}]" >&2; fi
+    logDebug "takeScreenshot [screenshotRequired=${cCyan}$screenshotRequired${cNc}]" 3 "ENTER"
+
     if [ $screenshotRequired = false ]; then return; fi
     screencap "$SCREENSHOTLOCATION"
     screenshotRequired=false
+
+    logDebug "takeScreenshot" 2 "EXIT"
 }
 
 # ##############################################################################
@@ -371,8 +441,10 @@ takeScreenshot() {
 # Output        : if true, return 0, else 1
 # ##############################################################################
 testColorNAND() {
-    if [ "$DEBUG" -ge 2 ]; then printInColor "DEBUG" "testColorNAND ${cPurple}$*${cNc}" >&2; fi
+    logDebug "testColorNAND ${cPurple}$*${cNc}" 2 "ENTER"
+
     _testColorNAND_max_delta=0
+
     for arg in "$@"; do
         shift
         case "$arg" in
@@ -389,16 +461,12 @@ testColorNAND() {
     shift                          # ignore arg
     for i in "$@"; do              # loop in colors
         if [ "$HEX" = "$i" ]; then # color found?
-            if [ "$DEBUG" -ge 2 ]; then
-                printInColor "DEBUG" "testColorNAND ${cCyan}$HEX${cNc} = ${cCyan}$i${cNc}" >&2
-            fi
+            logDebug "testColorNAND ${cCyan}$HEX${cNc} = ${cCyan}$i${cNc}" 2
             return 1 # At the first color found NAND is break, return 1
         else
             if [ "$DEBUG" -ge 2 ] || [ "$_testColorNAND_max_delta" -gt "0" ]; then
                 _testColorNAND_delta=$(HEXColorDelta "$HEX" "$i")
-                if [ "$DEBUG" -ge 2 ]; then
-                    printInColor "DEBUG" "testColorNAND ${cCyan}$HEX${cNc} != ${cCyan}$i${cNc} [Δ ${cCyan}$_testColorNAND_delta${cNc}%]" >&2
-                fi
+                logDebug "testColorNAND ${cCyan}$HEX${cNc} != ${cCyan}$i${cNc} [Δ ${cCyan}$_testColorNAND_delta${cNc}%]" 2
                 if [ "$_testColorNAND_delta" -le "$_testColorNAND_max_delta" ]; then
                     return 1
                 fi
@@ -416,7 +484,8 @@ testColorNAND() {
 # Output        : if true, return 0, else 1
 # ##############################################################################
 testColorOR() {
-    if [ "$DEBUG" -ge 2 ]; then printInColor "DEBUG" "testColorOR ${cPurple}$*${cNc}" >&2; fi
+    logDebug "testColorOR ${cPurple}$*${cNc}" 2 "ENTER"
+
     _testColorOR_max_delta=0
     for arg in "$@"; do
         shift
@@ -434,16 +503,12 @@ testColorOR() {
     shift                          # ignore arg
     for i in "$@"; do              # loop in colors
         if [ "$HEX" = "$i" ]; then # color found?
-            if [ "$DEBUG" -ge 2 ]; then
-                printInColor "DEBUG" "testColorOR ${cCyan}$HEX${cNc} = ${cCyan}$i${cNc}" >&2
-            fi
+            logDebug "testColorOR ${cCyan}$HEX${cNc} = ${cCyan}$i${cNc}" 2
             return 0 # At the first color found OR is break, return 0
         else
             if [ "$DEBUG" -ge 2 ] || [ "$_testColorOR_max_delta" -gt "0" ]; then
                 _testColorOR_delta=$(HEXColorDelta "$HEX" "$i")
-                if [ "$DEBUG" -ge 2 ]; then
-                    printInColor "DEBUG" "testColorOR ${cCyan}$HEX${cNc} != ${cCyan}$i${cNc} [Δ ${cCyan}$_testColorOR_delta${cNc}%]" >&2
-                fi
+                logDebug "testColorOR ${cCyan}$HEX${cNc} != ${cCyan}$i${cNc} [Δ ${cCyan}$_testColorOR_delta${cNc}%]" 2
                 if [ "$_testColorOR_delta" -le "$_testColorOR_max_delta" ]; then
                     return 0
                 fi
@@ -462,10 +527,13 @@ testColorOR() {
 # Args          : <X> <Y> <COLOR> <SLEEP>
 # ##############################################################################
 testColorORTapSleep() {
-    if [ "$DEBUG" -ge 2 ]; then printInColor "DEBUG" "testColorORTapSleep ${cPurple}$*${cNc}" >&2; fi
+    logDebug "testColorORTapSleep" 2 "ENTER"
+
     if testColorOR "$1" "$2" "$3"; then                # if color found
         inputTapSleep "$1" "$2" "${4:-$DEFAULT_SLEEP}" # tap & sleep
     fi
+
+    logDebug "testColorORTapSleep" 2 "EXIT"
 }
 
 # ##############################################################################
@@ -475,7 +543,8 @@ testColorORTapSleep() {
 # Output        : stdout MessageSuccess, stderr MessageFailure
 # ##############################################################################
 verifyHEX() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "verifyHEX ${cPurple}$*${cNc}" >&2; fi
+    logDebug "verifyHEX" 3 "ENTER"
+
     getColor "$1" "$2"
     if [ "$HEX" != "$3" ]; then
         printInColor "ERROR" "verifyHEX: Failure! Expected ${cCyan}$3${cNc}, but got ${cCyan}$HEX${cNc} instead. [Δ ${cCyan}$(HEXColorDelta "$HEX" "$3")${cNc}%]" >&2
@@ -507,8 +576,11 @@ wait() {
 # Descripton    : Click on auto if not already enabled
 # ##############################################################################
 doAuto() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "doAuto" >&2; fi
+    logDebug "doAuto" 3 "ENTER"
+
     testColorORTapSleep 760 1440 332b2b 0 # On:743b29 Off:332b2b
+
+    logDebug "doAuto" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -516,8 +588,11 @@ doAuto() {
 # Descripton    : Click on x4 if not already enabled
 # ##############################################################################
 doSpeed() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "doSpeed" >&2; fi
+    logDebug "doSpeed" 3 "ENTER"
+
     testColorORTapSleep 990 1440 332b2b 0 # On:[x2: 753b29, x4: 743b29] Off:332b2b
+
+    logDebug "doSpeed" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -525,8 +600,11 @@ doSpeed() {
 # Descripton    : Click on skip if avaible
 # ##############################################################################
 doSkip() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "doSkip" >&2; fi
+    logDebug "doSkip" 3 "ENTER"
+
     testColorORTapSleep 760 1440 502e1d 0 # Exists: 502e1d
+
+    logDebug "doSkip" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -537,7 +615,8 @@ doSkip() {
 #                   <FORCE>: true / false, default false
 # ##############################################################################
 switchTab() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "switchTab ${cPurple}$*${cNc} [activeTab=${cCyan}$activeTab${cNc}]" >&2; fi
+    logDebug "switchTab" 3 "ENTER"
+
     if [ "$1" = "$activeTab" ]; then
         return
     fi
@@ -595,6 +674,8 @@ switchTab() {
         verifyHEX 550 1690 ffffff "Switched to the Chat Tab." "Failed to switch to the Chat Tab."
         ;;
     esac
+
+    logDebug "switchTab" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -603,7 +684,8 @@ switchTab() {
 # Args          : <SECONDS>
 # ##############################################################################
 waitBattleFinish() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "waitBattleFinish ${cPurple}$*${cNc}" >&2; fi
+    logDebug "waitBattleFinish" 3 "ENTER"
+
     sleep "$1"
     finished=false
     until [ $finished = true ]; do
@@ -625,6 +707,8 @@ waitBattleFinish() {
         fi
         sleep 1
     done
+
+    logDebug "waitBattleFinish" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -632,7 +716,8 @@ waitBattleFinish() {
 # Descripton    : Waits until battle starts
 # ##############################################################################
 waitBattleStart() {
-    if [ "$DEBUG" -ge 3 ]; then printInColor "DEBUG" "waitBattleStart" >&2; fi
+    logDebug "waitBattleStart" 3 "ENTER"
+
     _waitBattleStart_count=0 # Max loops = 10 (10x.5s=5s max)
     # Check if pause button is present && less than 10 tries
     until testColorOR -f 110 1465 482f1f || [ $_waitBattleStart_count -ge 10 ]; do
@@ -644,6 +729,8 @@ waitBattleStart() {
         # In case none were found, try again starting with the pause button
     done
     sleep 2
+
+    logDebug "waitBattleStart" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -651,7 +738,8 @@ waitBattleStart() {
 # Descripton    : Counts the number of PvP Events.
 # ##############################################################################
 pvpEvents() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pvpEvents" >&2; fi
+    logDebug "pvpEvents" 3 "ENTER"
+
     pvpEventsActive=0
     if [ "$eventHoe" = true ]; then
         pvpEventsActive=$((pvpEventsActive + 1)) # Increment
@@ -662,6 +750,8 @@ pvpEvents() {
     if [ "$eventTv" = true ]; then
         pvpEventsActive=$((pvpEventsActive + 1)) # Increment
     fi
+
+    logDebug "pvpEvents" 3 "EXIT"
 }
 
 # ##############################################################################
@@ -674,7 +764,8 @@ pvpEvents() {
 # Remark        : Limited offers might screw this up.
 # ##############################################################################
 challengeBoss() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "challengeBoss" >&2; fi
+    logDebug "challengeBoss" 4 "ENTER"
+
     inputTapSleep 550 1650 3            # Begin
     if testColorOR 550 740 f2d79f; then # Check if boss
         inputTapSleep 550 1450 3        # Begin
@@ -758,6 +849,8 @@ challengeBoss() {
     else
         verifyHEX 450 1775 cc9261 "Challenged boss in campaign." "Failed to fight boss in Campaign."
     fi
+
+    logDebug "challengeBoss" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -765,7 +858,8 @@ challengeBoss() {
 # Descripton    : Collects and sends companion points, as well as auto lending mercenaries
 # ##############################################################################
 collectFriendsAndMercenaries() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectFriendsAndMercenaries" >&2; fi
+    logDebug "collectFriendsAndMercenaries" 4 "ENTER"
+
     inputTapSleep 970 810 1                                  # Friends
     inputTapSleep 930 1600                                   # Send & Recieve
     if testColorOR -d "$DEFAULT_DELTA" 825 1750 e21a07; then # Check if its necessary to send mercenaries
@@ -781,6 +875,8 @@ collectFriendsAndMercenaries() {
 
     wait
     verifyHEX 450 1775 cc9261 "Sent and recieved companion points, as well as auto lending mercenaries." "Failed to collect/send companion points or failed to auto lend mercenaries."
+
+    logDebug "collectFriendsAndMercenaries" 4 "ENTER"
 }
 
 # ##############################################################################
@@ -788,7 +884,8 @@ collectFriendsAndMercenaries() {
 # Descripton    : Collects fast rewards
 # ##############################################################################
 fastRewards() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fastRewards" >&2; fi
+    logDebug "fastRewards" 4 "ENTER"
+
     _fast_rewards_COUNT=0
     if testColorOR -d "$DEFAULT_DELTA" 980 1620 ed1f06; then # check red dot to see if free fast reward is avaible
         inputTapSleep 950 1660 1                             # Fast Rewards
@@ -802,6 +899,8 @@ fastRewards() {
         printInColor "INFO" "Fast Rewards collected already, not collecting..."
     fi
     verifyHEX 450 1775 cc9261 "Fast rewards checked." "Failed to check fast rewards."
+
+    logDebug "fastRewards" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -809,12 +908,15 @@ fastRewards() {
 # Descripton    : Loots afk chest
 # ##############################################################################
 lootAfkChest() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "lootAfkChest" >&2; fi
+    logDebug "lootAfkChest" 4 "ENTER"
+
     inputTapSleep 550 1500 1
     inputTapSleep 750 1350 3
     inputTapSleep 550 1850 1 # Tap campaign in case of level up
     wait
     verifyHEX 450 1775 cc9261 "AFK Chest looted." "Failed to loot AFK Chest."
+
+    logDebug "lootAfkChest" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -823,7 +925,8 @@ lootAfkChest() {
 # Remark        : Loops until you manually exit script.
 # ##############################################################################
 pushCampaign() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushCampaign" >&2; fi
+    logDebug "pushCampaign" 4 "ENTER"
+
     if $doUsePopularFormations; then
         _popularFormation=1
     fi
@@ -892,6 +995,7 @@ pushCampaign() {
         printInColor INFO "${cGreen}$_total_WIN Wins${cNc} / ${cRed}$_total_LOSS Losses${cNcS}"
     done
 
+    logDebug "pushCampaign" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -902,6 +1006,8 @@ pushCampaign() {
 #                   <TYPE>: Own, Popular
 # ##############################################################################
 push() {
+    logDebug "push" 4 "ENTER"
+
     inputTapSleep 550 1850 0 # Battle
     waitBattleStart
     doAuto
@@ -948,6 +1054,8 @@ push() {
         init
         run
     fi
+
+    logDebug "push" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -958,67 +1066,50 @@ push() {
 #                   <FORMATION>: 1,2,3,4,5,6
 # ##############################################################################
 chooseFormation() {
+    logDebug "chooseFormation" 4 "ENTER"
+
     printInColor INFO "Choosing $1 Formation $2"
+
     case "$1" in
     "Own")
+        inputTapSleep 80 1100 # Own Formations
         case "$2" in
-        "1")
-            inputTapSleep 80 1100  # Own Formations
-            inputTapSleep 900 1300 # First Formation
-            ;;
-        "2")
-            inputTapSleep 80 1100  # Own Formations
-            inputTapSleep 900 1500 # Second Formation
+        "1") inputTapSleep 900 1300 ;; # First Formation
+        "2") inputTapSleep 900 1500 ;; # Second Formation
+        *)
+            printInColor ERROR "Invalid formation number for Own type: $2"
+            logDebug "chooseFormation" 4 "EXIT"
+            return 1
             ;;
         esac
         ;;
     "Popular")
+        inputTapSleep 970 1820 1 # Formations
+        inputTapSleep 800 1600 1 # Popular
         case "$2" in
-        "1")
-            inputTapSleep 970 1820 1 # Formations
-            inputTapSleep 800 1600 1 # Popular
-            inputTapSleep 850 600 1  # 1st Formation
-            inputTapSleep 730 1800 1 # Use Formation
-            inputTapSleep 700 1240 1 # Confirm
-            ;;
-        "2")
-            inputTapSleep 970 1820 1 # Formations
-            inputTapSleep 800 1600 1 # Popular
-            inputTapSleep 850 775 1  # 2nd Formation
-            inputTapSleep 730 1800 1 # Use Formation
-            inputTapSleep 700 1240 1 # Confirm
-            ;;
-        "3")
-            inputTapSleep 970 1820 1 # Formations
-            inputTapSleep 800 1600 1 # Popular
-            inputTapSleep 850 950 1  # 3rd Formation
-            inputTapSleep 730 1800 1 # Use Formation
-            inputTapSleep 700 1240 1 # Confirm
-            ;;
-        "4")
-            inputTapSleep 970 1820 1 # Formations
-            inputTapSleep 800 1600 1 # Popular
-            inputTapSleep 850 1130 1 # 4th Formation
-            inputTapSleep 730 1800 1 # Use Formation
-            inputTapSleep 700 1240 1 # Confirm
-            ;;
-        "5")
-            inputTapSleep 970 1820 1 # Formations
-            inputTapSleep 800 1600 1 # Popular
-            inputTapSleep 850 1300 1 # 5th Formation
-            inputTapSleep 730 1800 1 # Use Formation
-            inputTapSleep 700 1240 1 # Confirm
-            ;;
-        "6")
-            inputTapSleep 970 1820 1 # Formations
-            inputTapSleep 800 1600 1 # Popular
-            inputTapSleep 850 1480 1 # 6th Formation
-            inputTapSleep 730 1800 1 # Use Formation
-            inputTapSleep 700 1240 1 # Confirm
+        "1") inputTapSleep 850 600 1 ;;  # 1st Formation
+        "2") inputTapSleep 850 775 1 ;;  # 2nd Formation
+        "3") inputTapSleep 850 950 1 ;;  # 3rd Formation
+        "4") inputTapSleep 850 1130 1 ;; # 4th Formation
+        "5") inputTapSleep 850 1300 1 ;; # 5th Formation
+        "6") inputTapSleep 850 1480 1 ;; # 6th Formation
+        *)
+            printInColor ERROR "Invalid formation number for Popular type: $2"
+            logDebug "chooseFormation" 4 "EXIT"
+            return 1
             ;;
         esac
+        inputTapSleep 730 1800 1 # Use Formation
+        inputTapSleep 700 1240 1 # Confirm
+        ;;
+    *)
+        printInColor ERROR "Invalid formation type: $1"
+        logDebug "chooseFormation" 4 "EXIT"
+        return 0
         ;;
     esac
+
+    logDebug "chooseFormation" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1030,7 +1121,8 @@ chooseFormation() {
 # Descripton    : Does the daily arena of heroes battles
 # ##############################################################################
 arenaOfHeroes() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes" >&2; fi
+    logDebug "arenaOfHeroes" 4 "ENTER"
+
     pvpEvents                # Counts number of Active pvp events
     inputTapSleep 740 1050 3 # Arena of Heroes
     inputTapSleep 550 80 2   # Collect Arena Tickets
@@ -1147,6 +1239,8 @@ arenaOfHeroes() {
             "Checked the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")" \
             "Failed to check the Arena of Heroes out. $(getCountersInColor "$_arenaOfHeroes_WIN" "$_arenaOfHeroes_LOSS")"
     fi
+
+    logDebug "arenaOfHeroes" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1156,7 +1250,8 @@ arenaOfHeroes() {
 # Output        : If failed, return 1
 # ##############################################################################
 arenaOfHeroes_tapClosestOpponent() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "arenaOfHeroes_tapClosestOpponent ${cPurple}$*${cNc}" >&2; fi
+    logDebug "arenaOfHeroes_tapClosestOpponent ${cPurple}$*${cNc}" 4 "ENTER"
+
     # Depending on the opponent number sent as a parameter ($1), this function
     # would attempt to check if there's an opponent above the one sent.
     # If there isn't, check the one above that one and so on until one is found.
@@ -1219,6 +1314,8 @@ arenaOfHeroes_tapClosestOpponent() {
         fi
         ;;
     esac
+
+    logDebug "arenaOfHeroes_tapClosestOpponent" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1226,7 +1323,8 @@ arenaOfHeroes_tapClosestOpponent() {
 # Descripton    : Try to battle in every Kings Tower
 # ##############################################################################
 kingsTower() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "kingsTower" >&2; fi
+    logDebug "kingsTower" 4 "ENTER"
+
     inputTapSleep 550 850 5 # King's Tower
     printInColor "INFO" "Fighting King's Tower until ${cCyan}$maxKingsTowerFights${cNc} defeat(s)."
 
@@ -1269,6 +1367,8 @@ kingsTower() {
     # Exit
     inputTapSleep 70 1810
     verifyHEX 240 1775 d49a61 "Battled at the Kings Tower." "Failed to battle at the Kings Tower."
+
+    logDebug "kingsTower" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1278,7 +1378,8 @@ kingsTower() {
 # Remark        : Limited offers might screw this up.
 # ##############################################################################
 kingsTower_battle() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "kingsTower_battle ${cPurple}$*${cNc}" >&2; fi
+    logDebug "kingsTower_battle ${cPurple}$*${cNc}" 4 "ENTER"
+
     _kingsTower_battle_COUNT=0 # Equivalent to loose
     _battle_WIN=0
 
@@ -1331,6 +1432,8 @@ kingsTower_battle() {
         sleep 2
     fi
     getCountersInColor $_battle_WIN $_kingsTower_battle_COUNT
+
+    logDebug "kingsTower_battle" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1339,7 +1442,8 @@ kingsTower_battle() {
 # Args          : <START_FROM_TAB>: true / false
 # ##############################################################################
 legendsTournament() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "legendsTournament ${cPurple}$*${cNc}" >&2; fi
+    logDebug "legendsTournament ${cPurple}$*${cNc}" 4 "ENTER"
+
     if [ "$1" = true ]; then # Check if starting from tab or already inside activity
         inputTapSleep 740 1050
     fi
@@ -1393,6 +1497,8 @@ legendsTournament() {
     verifyHEX 240 1775 d49a61 \
         "Battled at the Legends Tournament. $(getCountersInColor $_legendsTournament_WIN $_legendsTournament_LOOSE)" \
         "Failed to battle at the Legends Tournament. $(getCountersInColor $_legendsTournament_WIN $_legendsTournament_LOOSE)"
+
+    logDebug "legendsTournament" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1400,13 +1506,16 @@ legendsTournament() {
 # Descripton    : Starts Solo bounties
 # ##############################################################################
 soloBounties() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "soloBounties" >&2; fi
+    logDebug "soloBounties" 4 "ENTER"
+
     finished=false
+
     inputTapSleep 600 1320 2
     inputTapSleep 650 1700 1 # Solo Bounty
     inputTapSleep 780 1550 1 # Collect all
 
-    if testColorOR -d "$DEFAULT_DELTA" -f 337 1550 ffffff; then # Bounties waiting to be dispatched
+    # Check if there are bounties waiting to be dispatched
+    if testColorOR -d "$DEFAULT_DELTA" -f 337 1550 ffffff; then
         # Check once before scrolling down
         dispatchBounties 1
         inputSwipe 550 1400 550 400 500 # Scroll Down
@@ -1422,13 +1531,16 @@ soloBounties() {
             fi
             _gold=0
         done
-        if testColorOR -d "$DEFAULT_DELTA" -f 337 1550 ffffff; then # Bounties waiting to be dispatched
-            inputTapSleep 350 1550                                  # Dispatch all
-            inputTapSleep 550 1500 0                                # Confirm
+
+        # Check again if there are bounties waiting to be dispatched
+        if testColorOR -d "$DEFAULT_DELTA" -f 337 1550 ffffff; then
+            inputTapSleep 350 1550   # Dispatch all
+            inputTapSleep 550 1500 0 # Confirm
         fi
     fi
 
-    if [ "$doTeamBounties" = false ]; then # Return to Tab if $doTeamBounties = false
+    # Return to the appropriate tab based on doTeamBounties flag
+    if [ "$doTeamBounties" = false ]; then
         wait
         inputTapSleep 70 1810
         verifyHEX 240 1775 d49a61 "Collected/dispatched solo bounties." "Failed to collect/dispatch solo bounties."
@@ -1436,37 +1548,44 @@ soloBounties() {
         wait
         verifyHEX 650 1740 a7541a "Collected/dispatched solo bounties." "Failed to collect/dispatch solo bounties."
     fi
+
+    logDebug "soloBounties" 4 "EXIT"
 }
 
 # ##############################################################################
 # Function Name : dispatchBounties
 # Descripton    : Dispatches non-gold bounties.
 # Args          : <NUMBER>: 1 for pre scroll down, 2 for after.
-# ##############################################################################
+# ######################d########################################################
 dispatchBounties() {
-    if [ "$1" = 1 ]; then # Pre Scroll Down
-        # Check 1st Item
-        dispatchBounties_nonGold 110 465 faeb9a
-        # Check 2nd Item
-        dispatchBounties_nonGold 110 675 fcf3a3
-        # Check 3rd Item
-        dispatchBounties_nonGold 110 885 fcf8a8
-        # Check 4th Item
-        dispatchBounties_nonGold 110 1095 fbfaab
-        # Check 5th Item
-        dispatchBounties_nonGold 110 1305 fafaac
-    elif [ "$1" = 2 ]; then # Scrolled Down
-        # Check 1st Item
-        dispatchBounties_nonGold 110 535 fcf09f
-        # Check 2nd Item
-        dispatchBounties_nonGold 110 745 fcf5a4
-        # Check 3rd Item
-        dispatchBounties_nonGold 110 955 fcfaaa
-        # Check 4th Item
-        dispatchBounties_nonGold 110 1165 fbfaac
-        # Check 5th Item
-        dispatchBounties_nonGold 110 1375 fafaad
-    fi
+    logDebug "dispatchBounties ${cPurple}$*${cNc}" 4 "ENTER"
+
+    case "$1" in
+    1)
+        # Check and dispatch each bounty item in the pre-scroll down view
+        dispatchBounties_nonGold 110 465 faeb9a  # Check 1st Item
+        dispatchBounties_nonGold 110 675 fcf3a3  # Check 2nd Item
+        dispatchBounties_nonGold 110 885 fcf8a8  # Check 3rd Item
+        dispatchBounties_nonGold 110 1095 fbfaab # Check 4th Item
+        dispatchBounties_nonGold 110 1305 fafaac # Check 5th Item
+        ;;
+    2)
+        # Check and dispatch each bounty item in the scrolled down view
+        dispatchBounties_nonGold 110 535 fcf09f  # Check 1st Item
+        dispatchBounties_nonGold 110 745 fcf5a4  # Check 2nd Item
+        dispatchBounties_nonGold 110 955 fcfaaa  # Check 3rd Item
+        dispatchBounties_nonGold 110 1165 fbfaac # Check 4th Item
+        dispatchBounties_nonGold 110 1375 fafaad # Check 5th Item
+        ;;
+    *)
+        # Handle invalid argument case
+        printInColor "ERROR" "Invalid argument: $1. Expected 1 or 2."
+        logDebug "dispatchBounties" 4 "EXIT" # Log function exit with error
+        return 1
+        ;;
+    esac
+
+    logDebug "dispatchBounties" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1475,6 +1594,8 @@ dispatchBounties() {
 # Args          : <X> <Y>
 # ##############################################################################
 dispatchBounties_nonGold() {
+    logDebug "dispatchBounties_nonGold ${cPurple}$*${cNc}" 4 "ENTER"
+
     x="$1"
     x=$((x + 800)) # Move Right to Dispatch Button
     y="$2"
@@ -1485,6 +1606,8 @@ dispatchBounties_nonGold() {
     else
         _gold=$((_gold + 1)) # Increment
     fi
+
+    logDebug "dispatchBounties_nonGold" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1493,12 +1616,16 @@ dispatchBounties_nonGold() {
 # Args          : <X> <Y>
 # ##############################################################################
 dispatchBounties_nonGold_Autofill() {
+    logDebug "dispatchBounties_nonGold_Autofill ${cPurple}$*${cNc}" 4 "ENTER"
+
     x="$1"
     x=$((x + 800)) # Move Right to Dispatch Button
     y="$2"
     inputTapSleep "$x" "$y" 1 # Dispatch
     inputTapSleep 350 1170 1  # Autofill
     inputTapSleep 740 1170 1  # Dispatch
+
+    logDebug "dispatchBounties_nonGold_Autofill" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1507,7 +1634,8 @@ dispatchBounties_nonGold_Autofill() {
 # Args          : <START_FROM_TAB>: true / false
 # ##############################################################################
 teamBounties() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "teamBounties ${cPurple}$*${cNc}" >&2; fi
+    logDebug "teamBounties ${cPurple}$*${cNc}" 4 "ENTER"
+
     if [ "$1" = true ]; then # Check if starting from tab or already inside activity
         inputTapSleep 600 1320 1
     fi
@@ -1520,6 +1648,8 @@ teamBounties() {
     inputTapSleep 550 1500   # Confirm
     inputTapSleep 70 1810    # Return
     verifyHEX 240 1775 d49a61 "Collected/dispatched team bounties." "Failed to collect/dispatch team bounties."
+
+    logDebug "teamBounties" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1527,7 +1657,8 @@ teamBounties() {
 # Descripton    : Collects the Fountain of Time rewards.
 # ##############################################################################
 fountainOfTime() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "fountainOfTime" >&2; fi
+    logDebug "fountainOfTime" 4 "ENTER"
+
     inputTapSleep 800 700 4             # Temporal Rift
     inputTapSleep 250 1350 2            # Fountain of Time
     inputTapSleep 730 1360 2            # Collect
@@ -1541,6 +1672,8 @@ fountainOfTime() {
     fi
     inputTapSleep 70 1810 # Return
     verifyHEX 240 1775 d49a61 "Collected Fountain of Time." "Failed to collect Fountain of Time."
+
+    logDebug "fountainOfTime" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1549,7 +1682,8 @@ fountainOfTime() {
 # Remark        : Loops until you manually exit script.
 # ##############################################################################
 pushKingsTower() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "pushKingsTower" >&2; fi
+    logDebug "pushKingsTower" 4 "ENTER"
+
     if $doUsePopularFormations; then
         _popularFormation=1
     fi
@@ -1643,6 +1777,8 @@ pushKingsTower() {
 
         printInColor INFO "${cGreen}$_total_WIN Wins${cNc} / ${cRed}$_total_LOSS Losses${cNcS}"
     done
+
+    logDebug "pushKingsTower" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1654,7 +1790,8 @@ pushKingsTower() {
 # Descripton    : Buy items from store
 # ##############################################################################
 buyFromStore() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "buyFromStore" >&2; fi
+    logDebug "buyFromStore" 4 "ENTER"
+
     _store_purchase_COUNT=0
     inputTapSleep 330 1750 3 # Store
 
@@ -1754,6 +1891,8 @@ buyFromStore() {
     fi
     inputTapSleep 70 1810 # Return
     verifyHEX 20 1775 d49a61 "Visited the Store." "Failed to visit the Store."
+
+    logDebug "buyFromStore" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1762,10 +1901,13 @@ buyFromStore() {
 # Args          : <X> <Y>
 # ##############################################################################
 buyFromStore_buyItem() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "buyFromStore_buyItem ${cPurple}$*${cNc}" >&2; fi
+    logDebug "buyFromStore_buyItem ${cPurple}$*${cNc}" 4 "ENTER"
+
     inputTapSleep "$1" "$2" 1 # Item
     inputTapSleep 550 1540 1  # Purchase
     inputTapSleep 550 1700    # Close popup
+
+    logDebug "buyFromStore_buyItem" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1774,7 +1916,8 @@ buyFromStore_buyItem() {
 # Remark        : Should be removed if one day the test server has the new shop
 # ##############################################################################
 buyFromStore_test() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "buyFromStore_test" >&2; fi
+    logDebug "buyFromStore_test" 4 "ENTER"
+
     inputTapSleep 330 1650 3
 
     if [ "$buyStoreDust" = true ]; then # Dust
@@ -1843,6 +1986,8 @@ buyFromStore_test() {
     fi
     inputTapSleep 70 1810 # Return
     verifyHEX 20 1775 d49a61 "Visited the Store." "Failed to visit the Store."
+
+    logDebug "buyFromStore_test" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1850,8 +1995,8 @@ buyFromStore_test() {
 # Descripton    : Battles against Guild boss Wrizz
 # ##############################################################################
 guildHunts() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "guildHunts" >&2; fi
-    
+    logDebug "guildHunts" 4 "ENTER"
+
     # Open Guild
     inputTapSleep 300 600 10
 
@@ -1892,6 +2037,8 @@ guildHunts() {
         inputTapSleep 70 1810
         verifyHEX 70 1000 a9a95f "Battled Wrizz and possibly Soren." "Failed to battle Wrizz and possibly Soren."
     fi
+
+    logDebug "guildHunts" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1900,7 +2047,7 @@ guildHunts() {
 # Remark        : May break because "some resources have exceeded their maximum limit"
 # ##############################################################################
 guildHunts_quickBattle() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "guildHunts_quickBattle" >&2; fi
+    logDebug "guildHunts_quickBattle" 4 "ENTER"
 
     # Check if possible to fight Wrizz -> Grey: a1a1a1 / Blue: 9de8be
     if [ "$guildBattleType" = "challenge" ]; then
@@ -1919,6 +2066,8 @@ guildHunts_quickBattle() {
         inputTapSleep 550 800 0  # Reward
         inputTapSleep 550 800 1  # Reward x2
     fi
+
+    logDebug "guildHunts_quickBattle" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1926,7 +2075,8 @@ guildHunts_quickBattle() {
 # Descripton    : Let's do a "free" summon with Companion Points
 # ##############################################################################
 nobleTavern() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "nobleTavern" >&2; fi
+    logDebug "nobleTavern" 4 "ENTER"
+
     inputTapSleep 280 1370 3 # The Noble Tavern
     inputTapSleep 400 1820 1 # The noble tavern again
 
@@ -1942,6 +2092,8 @@ nobleTavern() {
 
     inputTapSleep 70 1810
     verifyHEX 20 1775 d49a61 "Summoned one hero with Companion Points." "Failed to summon one hero with Companion Points."
+
+    logDebug "nobleTavern" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1950,7 +2102,8 @@ nobleTavern() {
 # Concept       : https://github.com/Fortigate/AFK-Daily/blob/master/deploy.sh > collectInnGifts()
 # ##############################################################################
 oakInn() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "oakInn" >&2; fi
+    logDebug "oakInn" 4 "ENTER"
+
     inputTapSleep 500 200 5 # Oak Inn
     printInColor "INFO" "Searching for presents to collect..."
 
@@ -1980,6 +2133,8 @@ oakInn() {
     verifyHEX 20 1775 d49a61 \
         "Attempted to collect Oak Inn presents." \
         "Failed to collect Oak Inn presents."
+
+    logDebug "oakInn" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1987,7 +2142,8 @@ oakInn() {
 # Descripton    : Strengthen Crystal
 # ##############################################################################
 strengthenCrystal() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "strengthenCrystal" >&2; fi
+    logDebug "strengthenCrystal" 4 "ENTER"
+
     if testColorOR -d "$DEFAULT_DELTA" 870 1115 ff1908; then # If red circle
         inputTapSleep 760 1030 3                             # Resonating Crystal
 
@@ -2009,6 +2165,8 @@ strengthenCrystal() {
         printInColor "INFO" "Not necessary to strengthen the resonating Crystal."
     fi
     verifyHEX 20 1775 d49a61 "Strengthened resonating Crystal." "Failed to Strenghen Resonating Crystal."
+
+    logDebug "strengthenCrystal" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -2016,7 +2174,8 @@ strengthenCrystal() {
 # Descripton    : Auto ascend heroes
 # ##############################################################################
 templeOfAscension() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "templeOfAscension" >&2; fi
+    logDebug "templeOfAscension" 4 "ENTER"
+
     if testColorOR -d "$DEFAULT_DELTA" 450 1050 ff1706; then # If red circle
         inputTapSleep 280 960                                # Temple Of Ascension
         inputTapSleep 900 1800                               # Auto Ascend
@@ -2030,6 +2189,8 @@ templeOfAscension() {
     else
         printInColor "INFO" "No heroes to ascend."
     fi
+
+    logDebug "templeOfAscension" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -2038,7 +2199,8 @@ templeOfAscension() {
 # Args          : <START_FROM_TAB>: true / false
 # ##############################################################################
 twistedRealmBoss() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "twistedRealmBoss ${cPurple}$*${cNc}" >&2; fi
+    logDebug "twistedRealmBoss ${cPurple}$*${cNc}" 4 "ENTER"
+
     if [ "$1" = true ]; then     # Check if starting from tab or already inside activity
         inputTapSleep 300 600 10 # Guild
     fi
@@ -2080,6 +2242,8 @@ twistedRealmBoss() {
     inputTapSleep 70 1810
     inputTapSleep 70 1810 1
     verifyHEX 20 1775 d49a61 "Checked Twisted Realm Boss out." "Failed to check the Twisted Realm out."
+
+    logDebug "twistedRealmBoss" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -2091,7 +2255,8 @@ twistedRealmBoss() {
 # Descripton    : Checks where to end the script
 # ##############################################################################
 checkWhereToEnd() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "checkWhereToEnd" >&2; fi
+    logDebug "checkWhereToEnd" 4 "ENTER"
+
     case "$endAt" in
     "oak")
         switchTab "Ranhorn" true
@@ -2139,6 +2304,8 @@ checkWhereToEnd() {
         printInColor "WARN" "Unknown location to end script on. Ignoring..." >&2
         ;;
     esac
+
+    logDebug "checkWhereToEnd" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -2147,7 +2314,8 @@ checkWhereToEnd() {
 # Remark        : May break because "some resources have exceeded their maximum limit"
 # ##############################################################################
 collectQuestChests() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectQuestChests" >&2; fi
+    logDebug "collectQuestChests" 4 "ENTER"
+
     # WARN: May break because "some resources have exceeded their maximum limit"
     # WARN: This actually happened to me today, and the script handled it well, as it thought it had one more chest to collect
     # WARN: and closed the warning message. Might not be a problem anymore.
@@ -2169,6 +2337,8 @@ collectQuestChests() {
 
     inputTapSleep 70 1650 2 # Return
     verifyHEX 20 1775 d49a61 "Collected daily and weekly quest chests." "Failed to collect daily and weekly quest chests."
+
+    logDebug "collectQuestChests" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -2176,7 +2346,8 @@ collectQuestChests() {
 # Descripton    : Collects quest chests
 # ##############################################################################
 collectQuestChests_quick() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectQuestChests_quick" >&2; fi
+    logDebug "collectQuestChests_quick" 4 "ENTER"
+
     # Collect Quests
     until testColorNAND -d "$DEFAULT_DELTA" 700 670 7dfff1; do # Old value: 82fdf5
         inputTapSleep 930 680
@@ -2198,6 +2369,8 @@ collectQuestChests_quick() {
         inputTapSleep 990 430                                                                   # Chest 100
         inputTapSleep 580 600                                                                   # Collect
     fi
+
+    logDebug "collectQuestChests_quick" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -2206,7 +2379,8 @@ collectQuestChests_quick() {
 # Remark        : May break because "some resources have exceeded their maximum limit"
 # ##############################################################################
 collectMail() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectMail" >&2; fi
+    logDebug "collectMail" 4 "ENTER"
+
     # WARN: May break because "some resources have exceeded their maximum limit"
     if testColorOR -d "$DEFAULT_DELTA" 1011 606 fe2b16; then # Red mark
         inputTapSleep 960 650                                # Mail
@@ -2217,6 +2391,8 @@ collectMail() {
     else
         printInColor "INFO" "No mail to collect."
     fi
+
+    logDebug "collectMail" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -2225,7 +2401,8 @@ collectMail() {
 # Remark        : Breaks if a pop-up message shows up or the merchant ship moves location "drastically"
 # ##############################################################################
 collectMerchants() {
-    if [ "$DEBUG" -ge 4 ]; then printInColor "DEBUG" "collectMerchants" >&2; fi
+    logDebug "collectMerchants" 4 "ENTER"
+
     inputTapSleep 120 300 7 # Merchants
     # WARN: Breaks if a pop-up message shows up
 
@@ -2286,6 +2463,8 @@ collectMerchants() {
 
     inputTapSleep 70 1810 4
     verifyHEX 20 1775 d49a61 "Attempted to collect merchant freebies." "Failed to collect merchant freebies."
+
+    logDebug "collectMerchants" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -2374,16 +2553,19 @@ init() {
         #Check special popup that need to be closed with the cross
         testColorORTapSleep 1100 300 131517
     done
+
     # Preload graphics
     switchTab "Campaign" true
     sleep 3
     switchTab "Dark Forest"
     sleep 1
+
     # Check for HoE event
     if testColorOR -d "$DEFAULT_DELTA" 770 1165 c19e3a; then
         printInColor "INFO" "Heroes of Esperia event detected."
         eventHoe=true
     fi
+
     switchTab "Ranhorn"
     sleep 1
     switchTab "Campaign" true
@@ -2392,7 +2574,8 @@ init() {
     # Open menu for friends, etc
     inputTapSleep 970 430 0
 
-    if testColorOR -f 740 205 ffc359; then # Check if game is being updated
+    # Check if game is being updated
+    if testColorOR -f 740 205 ffc359; then
         printInColor "INFO" "Game is being updated!" >&2
         if [ "$waitForUpdate" = true ]; then
             printInColor "INFO" "Waiting for game to finish update..." >&2
@@ -2480,4 +2663,4 @@ run
 
 echo
 printInColor "INFO" "End of script! ($(date))"
-exit
+exit 0
