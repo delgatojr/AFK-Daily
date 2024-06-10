@@ -1823,7 +1823,8 @@ buyFromStore() {
 
     _store_purchase_COUNT=0
 
-    inputSwipe 550 1400 550 400 500 # Scroll Down
+    inputSwipe 550 1400 550 400 100 # Scroll Down
+    sleep 2
     inputTapSleep 440 900 3         # Store
 
     # if [ "$buyStoreDust" = true ]; then # Dust
