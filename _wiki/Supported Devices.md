@@ -54,7 +54,7 @@ Here's a list of devices where the script has been successfully run at least onc
 <!-- <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Features">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Features">Previous page</a>
 |
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Get-started">Next page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Get-started">Next page</a>
 </div> -->

@@ -12,6 +12,8 @@
 
 ## Description
 
+Continuing [Zebiano's](https://github.com/zebscripts/AFK-Daily) work.
+
 This script is meant to automate the process of daily activities within the [AFK Arena](https://play.google.com/store/apps/details?id=com.lilithgame.hgame.gp&hl=en_US) game. It uses [ADB](https://developer.android.com/studio/command-line/adb) to analyse pixel colors in screenshots and tap on the screen accordingly. If you like our work, please consider starring this repository (and joining our [Discord](https://discord.gg/Fq2cfqjp8D)) as it lets us know people use the script, which motivates us to keep working on it!
 
 <p align="center"><img src="https://i.imgur.com/zgGm8GE.png" alt="Example script output"></p>
@@ -27,15 +29,15 @@ This is a very fragile script (it relies on pixel accuracy), which means the pro
 
 It's basically an auto-completer of the AFK Arena daily tasks. If you easily lose interest in playing a game because you have nothing to do, then we **strongly recommend not using this script**, it'll definitely ruin the fun for you. Otherwise, if you enjoy watching a computer perform tasks for you, you've come to the right place!
 
-The script is capable of various things, [here's a list of all the features](https://github.com/zebscripts/AFK-Daily/wiki/Features). You can technically also use it solely as a "push campaign" or "push towers" script, more info [here](https://github.com/zebscripts/AFK-Daily/wiki/Features#push-campaigntowers-only).
+The script is capable of various things, [here's a list of all the features](https://github.com/delgatojr/AFK-Daily/wiki/Features). You can technically also use it solely as a "push campaign" or "push towers" script, more info [here](https://github.com/delgatojr/AFK-Daily/wiki/Features#push-campaigntowers-only).
 
 ## Quickstart
 
-We've created a wiki article explaining how to get started, check it out [here](https://github.com/zebscripts/AFK-Daily/wiki/Get-started).
+We've created a wiki article explaining how to get started, check it out [here](https://github.com/delgatojr/AFK-Daily/wiki/Get-started).
 
 ## Want to contribute?
 
-Great! It's always nice to have more people take part and make the experience a better one for everyone. If you have a feature request and/or feedback, take a look at [this article](https://github.com/zebscripts/AFK-Daily/wiki/Feature-Requests). If you want to contribute by coding new features, check [here](https://github.com/zebscripts/AFK-Daily/wiki/Contribute) instead!
+Great! It's always nice to have more people take part and make the experience a better one for everyone. If you have a feature request and/or feedback, take a look at [this article](https://github.com/delgatojr/AFK-Daily/wiki/Feature-Requests). If you want to contribute by coding new features, check [here](https://github.com/delgatojr/AFK-Daily/wiki/Contribute) instead!
 
 ## Discord
 

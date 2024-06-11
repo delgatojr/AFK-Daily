@@ -7,7 +7,7 @@ Here are some tips to keep in mind:
 <!-- <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Usage">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Usage">Previous page</a>
 |
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/FAQ">Next page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/FAQ">Next page</a>
 </div> -->

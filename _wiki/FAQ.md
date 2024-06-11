@@ -21,7 +21,7 @@ Do with this information what you want. I'm *not responsible at all* if anything
 <!-- <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Tips">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Tips">Previous page</a>
 |
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Known-Issues">Next page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Known-Issues">Next page</a>
 </div> -->

@@ -30,7 +30,7 @@ USAGE: deploy.sh [OPTIONS]
 
 DESCRIPTION
    Automate daily activities within the AFK Arena game.  
-   More info: https://github.com/zebscripts/AFK-Daily    
+   More info: https://github.com/delgatojr/AFK-Daily    
 
 OPTIONS
    -h, --help
@@ -129,7 +129,7 @@ EXAMPLES
 <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Config">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Config">Previous page</a>
 |
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Specific">Next page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Specific">Next page</a>
 </div>

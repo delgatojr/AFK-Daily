@@ -15,18 +15,18 @@ The script is not finding BlueStacks? Then most likely you need to specify the p
 
 <hr>
 
-If you are creating a [Github Issue](https://github.com/zebscripts/AFK-Daily/issues) report or you want to troubleshoot some problem with AFK-Daily, logs are the way to go and they are mandatory if you are creating a [Github Issue](https://github.com/zebscripts/AFK-Daily/issues) report.
+If you are creating a [Github Issue](https://github.com/delgatojr/AFK-Daily/issues) report or you want to troubleshoot some problem with AFK-Daily, logs are the way to go and they are mandatory if you are creating a [Github Issue](https://github.com/delgatojr/AFK-Daily/issues) report.
 
 - Add the option `-v 9` to your command: `./deploy.sh -v 9`
 - Reproduce the issue
 - Take a screenshot of the problem
 - Copy/paste the log
-- Open the [issue](https://github.com/zebscripts/AFK-Daily/issues)
+- Open the [issue](https://github.com/delgatojr/AFK-Daily/issues)
 
 <!-- <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Known-Issues">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Known-Issues">Previous page</a>
 |
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Feature-Requests">Next page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Feature-Requests">Next page</a>
 </div> -->

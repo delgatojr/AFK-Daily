@@ -167,7 +167,11 @@ Here is the [source](https://www.javacodegeeks.com/2013/10/shell-scripting-best-
 
     ```sh
     myfunc() {
-        if [ $DEBUG -ge 3 ]; then echo "[DEBUG] myfunc" >&1; fi
+        logDebug "myfunc" 3 "ENTER"
+        
+        # Your code
+
+        logDebug "myfunc" 3 "EXIT"
     }
     ```
 
@@ -188,8 +192,11 @@ Here is the [source](https://www.javacodegeeks.com/2013/10/shell-scripting-best-
     # Remark         :
     # ##############################################################################
     myfunc() {
-        if [ $DEBUG -ge 3 ]; then echo "[DEBUG] myfunc" >&1; fi
+        logDebug "myfunc" 3 "ENTER"
+
         test 800 600            # do test
+
+        logDebug "myfunc" 3 "EXIT"
     }
     ```
 
@@ -200,8 +207,11 @@ Here is the [source](https://www.javacodegeeks.com/2013/10/shell-scripting-best-
     # description if not explicit name
     # return values
     myfunc() {
-        if [ $DEBUG -ge 3 ]; then echo "[DEBUG] myfunc" >&1; fi
+        logDebug "myfunc" 3 "ENTER"
+
         test 800 600            # do test
+
+        logDebug "myfunc" 3 "EXIT"
     }
     ```
 
@@ -287,7 +297,7 @@ Some other useful documentation:
 
 ```ini
 # --- CONFIG: Modify accordingly to your game! --- #
-# --- Use this link for help: https://github.com/zebscripts/AFK-Daily/wiki/Config --- #
+# --- Use this link for help: https://github.com/delgatojr/AFK-Daily/wiki/Config --- #
 # Player
 canOpenSoren=false
 arenaHeroesOpponent=5
@@ -364,7 +374,7 @@ doCollectMerchantFreebies=false
 
 ```ini
 # --- CONFIG: Modify accordingly to your game! --- #
-# --- Use this link for help: https://github.com/zebscripts/AFK-Daily/wiki/Config --- #
+# --- Use this link for help: https://github.com/delgatojr/AFK-Daily/wiki/Config --- #
 # Player
 canOpenSoren=false
 arenaHeroesOpponent=5
@@ -441,7 +451,7 @@ doCollectMerchantFreebies=false
 
 ```ini
 # --- CONFIG: Modify accordingly to your game! --- #
-# --- Use this link for help: https://github.com/zebscripts/AFK-Daily/wiki/Config --- #
+# --- Use this link for help: https://github.com/delgatojr/AFK-Daily/wiki/Config --- #
 # Player
 canOpenSoren=false
 arenaHeroesOpponent=5
@@ -518,7 +528,7 @@ doCollectMerchantFreebies=false
 
 ```ini
 # --- CONFIG: Modify accordingly to your game! --- #
-# --- Use this link for help: https://github.com/zebscripts/AFK-Daily/wiki/Config --- #
+# --- Use this link for help: https://github.com/delgatojr/AFK-Daily/wiki/Config --- #
 # Player
 canOpenSoren=false
 arenaHeroesOpponent=5
@@ -595,7 +605,7 @@ doCollectMerchantFreebies=false
 
 ```ini
 # --- CONFIG: Modify accordingly to your game! --- #
-# --- Use this link for help: https://github.com/zebscripts/AFK-Daily/wiki/Config --- #
+# --- Use this link for help: https://github.com/delgatojr/AFK-Daily/wiki/Config --- #
 # Player
 canOpenSoren=false
 arenaHeroesOpponent=5
@@ -670,5 +680,5 @@ doCollectMerchantFreebies=true
 <!-- <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Contribute">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Contribute">Previous page</a>
 </div> -->

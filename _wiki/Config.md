@@ -86,6 +86,7 @@ The script acts depending on a set of variables. In order to change these, open 
 | `doArenaOfHeroes`     | `Boolean` | If `true`, fights in the Arena of Heroes.                | `true`  |
 | `doLegendsTournament` | `Boolean` | If `true`, fights in the Legends' Challenger Tournament. | `true`  |
 | `doKingsTower`        | `Boolean` | If `true`, fights in the King's Towers.                  | `true`  |
+| `doFountainOfTime`    | `Boolean` | If `true`, collects the Fountain of Time.                | `true`  |
 
 ## Ranhorn
 
@@ -114,7 +115,7 @@ The script acts depending on a set of variables. In order to change these, open 
 
 ```ini
 # --- CONFIG: Modify accordingly to your game! --- #
-# --- Use this link for help: https://github.com/zebscripts/AFK-Daily/wiki/Config --- #
+# --- Use this link for help: https://github.com/delgatojr/AFK-Daily/wiki/Config --- #
 # Player
 canOpenSoren=false
 arenaHeroesOpponent=5
@@ -193,7 +194,7 @@ Need to be run with `-f` flag!
 
 ```ini
 # --- CONFIG: Modify accordingly to your game! --- #
-# --- Use this link for help: https://github.com/zebscripts/AFK-Daily/wiki/Config --- #
+# --- Use this link for help: https://github.com/delgatojr/AFK-Daily/wiki/Config --- #
 # Player
 canOpenSoren=false
 arenaHeroesOpponent=5
@@ -270,7 +271,7 @@ doCollectMerchantFreebies=false
 
 ```ini
 # --- CONFIG: Modify accordingly to your game! --- #
-# --- Use this link for help: https://github.com/zebscripts/AFK-Daily/wiki/Config --- #
+# --- Use this link for help: https://github.com/delgatojr/AFK-Daily/wiki/Config --- #
 # Player
 canOpenSoren=false
 arenaHeroesOpponent=5
@@ -345,7 +346,7 @@ doCollectMerchantFreebies=false
 <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Installation">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Installation">Previous page</a>
 |
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Usage">Next page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Usage">Next page</a>
 </div>

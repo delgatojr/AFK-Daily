@@ -13,7 +13,7 @@ Also, **please make sure your game language is English and to have fought in bat
 <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Get-started">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Get-started">Previous page</a>
 |
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Tools">Next page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Tools">Next page</a>
 </div>

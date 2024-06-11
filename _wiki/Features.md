@@ -8,21 +8,16 @@ The script is capable of the following:
   * Auto-lend Mercenaries
 * **Dark Forest**
   * Send Heroes on Solo and Team Bounty Quests
+    * Optionally, refresh store until maximum number of gold bounties reached.
   * Fight in the Arena of Heroes
   * Fight in the Legends Tournament
   * Fight in all available King's Towers
+  * Collect Fountain of Time
 * **Ranhorn**
   * Fight Wrizz and Soren if available. Can also open Soren for you.
   * Fight in the Twisted Realm
-  * Buy various items from the Store
-    * Dust
-    * Poe Coins
-    * Soulstone
-    * Primordial Emblem
-    * Amplifying Emblem
-    * Limited Gold / Diam offer
-    * Weekly Guild
-    * Weekly Labyrinth
+  * Quick Buys items from the Store
+    * Optionally, refreshes store X number of times.
   * Strengthen the Resonating Crystal
   * Summon one Hero with Companion Points
   * Collect Oak Inn presents
@@ -50,7 +45,7 @@ It is also possible to use the script to push campaign levels or Kings Towers on
 <!-- <hr>
 
 <div align="center">
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Home">Previous page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Home">Previous page</a>
 |
-<a href="https://github.com/zebscripts/AFK-Daily/wiki/Supported-Devices">Next page</a>
+<a href="https://github.com/delgatojr/AFK-Daily/wiki/Supported-Devices">Next page</a>
 </div> -->
