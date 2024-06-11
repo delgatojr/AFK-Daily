@@ -1565,16 +1565,20 @@ buyFromStore() {
 
     # Fuck all that just do Quick Buy
     if testColorOR -d "5" 860 720 fad8a5; then
-        until [ "$_store_purchase_COUNT" -ge "$storeRefreshes" ]; do
+        # Ensure at least one iteration if storeRefreshes is zero
+        storeRefreshLimit=${storeRefreshes:-1}
+
+        while [ "$_store_purchase_COUNT" -lt "$storeRefreshLimit" ]; do
             inputTapSleep 940 720                                # Quick Buy
             inputTapSleep 720 1220                               # Purchase
             inputTapSleep 550 1700 2                             # Close popup
             _store_purchase_COUNT=$((_store_purchase_COUNT + 1)) # Increment
-            if [ "$_store_purchase_COUNT" -lt "$storeRefreshes" ]; then
+
+            # Refresh only if storeRefreshes is greater than zero
+            if [ "$storeRefreshes" -gt 0 ] && [ "$_store_purchase_COUNT" -lt "$storeRefreshLimit" ]; then
                 inputTapSleep 1000 290 # Refresh
                 inputTapSleep 700 1270 # Confirm
             fi
-
         done
     else
         printInColor INFO "Quick Buy not found."
