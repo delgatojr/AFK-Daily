@@ -3,23 +3,26 @@ name: Update Wiki
 on:
   push:
     paths:
-      # Trigger only when wiki directory changes
-      - "_wiki/**"
+      - "_wiki/**"  # Trigger only when _wiki directory changes
     branches:
-      # And only on master branch
-      - master
+      - master  # And only on the master branch
 
 jobs:
   Update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4 # Use the latest version that supports Node.js 20
+        
+      - name: Debug - List Files
+        run: ls -R
+
       - name: Push Wiki Changes
         uses: Andrew-Chen-Wang/github-wiki-action@v4
         env:
-          # Make sure you have that / at the end. We use rsync
+          # We use rsync
           # WIKI_DIR's default is wiki/
-          WIKI_DIR: _wiki/
+          WIKI_DIR: _wiki/  # Ensure this ends with a /
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_MAIL: ${{ secrets.OWNER_EMAIL }}
-          GH_NAME: ${{ github.repository_owner }}
+          GH_NAME: ${{ github.actor }}
