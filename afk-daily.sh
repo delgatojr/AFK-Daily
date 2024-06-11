@@ -29,9 +29,9 @@ DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
 
 # Event flags
-eventHoe=true          # Set to `true` if "Heroes of Esperia" event is live
-eventTs=true           # Set to `true` if "Treasure Scramble" event is live
-eventTv=false          # Set to `true` if "Treasure Vanguard" event is live
+eventHoe=true           # Set to `true` if "Heroes of Esperia" event is live
+eventTs=true            # Set to `true` if "Treasure Scramble" event is live
+eventTv=false           # Set to `true` if "Treasure Vanguard" event is live
 bountifulBounties=false # Set to `true` if "Bountiful Bounties" event is live
 
 # Script state variables (Do not modify)
@@ -628,8 +628,7 @@ switchTab() {
             [ "$doChallengeBoss" = true ] ||
             [ "$doFastRewards" = true ] ||
             [ "$doCollectFriendsAndMercenaries" = true ] ||
-            [ "$doLootAfkChest" = true ] ||
-            [ "$doPushCampaign" = true ]; then
+            [ "$doLootAfkChest" = true ]; then
             inputTapSleep 550 1850 2
             inputTapSleep 550 1850
             activeTab="$1"
@@ -643,8 +642,7 @@ switchTab() {
             [ "$doArenaOfHeroes" = true ] ||
             [ "$doLegendsTournament" = true ] ||
             [ "$doKingsTower" = true ] ||
-            [ "$doFountainOfTime" = true ] ||
-            [ "$doPushKingsTower" = true ]; then
+            [ "$doFountainOfTime" = true ]; then
             inputTapSleep 300 1850 2
             inputTapSleep 300 1850
             activeTab="$1"
@@ -918,199 +916,6 @@ lootAfkChest() {
     verifyHEX 450 1775 af7646 "AFK Chest looted." "Failed to loot AFK Chest."
 
     logDebug "lootAfkChest" 4 "EXIT"
-}
-
-# ##############################################################################
-# Function Name : pushCampaign
-# Descripton    : Pushes campaign using popular formations
-# Remark        : Loops until you manually exit script.
-# ##############################################################################
-pushCampaign() {
-    logDebug "pushCampaign" 4 "ENTER"
-
-    if $doUsePopularFormations; then
-        _popularFormation=1
-    fi
-    if $doUseOwnFormations; then
-        _ownFormation=1
-    fi
-    _total_LOSS=0
-    _total_WIN=0
-
-    inputTapSleep 550 1650 3            # Begin
-    if testColorOR 550 740 f0daad; then # Check if boss
-        inputTapSleep 550 1450 3        # Begin
-    fi
-
-    while true; do
-        _own_battle_COUNT=0     # Loss Counter for Own Formations
-        _popular_battle_COUNT=0 # Loss Counter for Popular Formations
-        _battle_WIN=0
-
-        if $doUseOwnFormations; then
-            # Cycle through Own Formations until "totalOwnFormations" or a win
-            until [ "$_ownFormation" -gt "$totalOwnFormations" ] || [ "$_battle_WIN" -ge 1 ]; do
-                if $doUseOwnFormations; then
-                    chooseFormation "Own" "$_ownFormation"
-                fi
-                # Try each formation until "maxFormationTries" or a win
-                until [ "$_own_battle_COUNT" -ge "$maxFormationTries" ] || [ "$_battle_WIN" -ge 1 ]; do
-                    push "Campaign" "Own"
-                done
-                _ownFormation=$((_ownFormation + 1)) # Increment formation
-                _own_battle_COUNT=0                  # Reset loss counter
-            done
-        fi
-
-        if $doUsePopularFormations; then
-            # Cycle through Popular Formations until "totalPopularFormations" or a win
-            until [ "$_popularFormation" -gt "$totalPopularFormations" ] || [ "$_battle_WIN" -ge 1 ]; do
-                if $doUsePopularFormations; then
-                    chooseFormation "Popular" "$_popularFormation"
-                fi
-                # Try each formation until "maxFormationTries" or a win
-                until [ "$_popular_battle_COUNT" -ge "$maxFormationTries" ] || [ "$_battle_WIN" -ge 1 ]; do
-                    push "Campaign" "Popular"
-                done
-                _popularFormation=$((_popularFormation + 1)) # Increment formation
-                _popular_battle_COUNT=0                      # Reset counter back to zero
-            done
-        fi
-
-        if [ "$doUseOwnFormations" = "false" ] && [ "$doUsePopularFormations" = "false" ]; then
-            count=1
-            while [ "$count" -le 5 ]; do # Battle 5 times
-                push "Campaign"
-                count=$((count + 1))
-            done
-        fi
-
-        # Reset Formations back to one
-        if $doUsePopularFormations; then
-            _popularFormation=1
-        fi
-        if $doUseOwnFormations; then
-            _ownFormation=1
-        fi
-
-        printInColor INFO "${cGreen}$_total_WIN Wins${cNc} / ${cRed}$_total_LOSS Losses${cNcS}"
-    done
-
-    logDebug "pushCampaign" 4 "EXIT"
-}
-
-# ##############################################################################
-# Function Name : push
-# Descripton    : Battling for pushing Campaign or King's Tower.
-# Args          : <MODE> <TYPE>
-#                   <MODE>: Campaign, KT (King's Tower)
-#                   <TYPE>: Own, Popular
-# ##############################################################################
-push() {
-    logDebug "push" 4 "ENTER"
-
-    inputTapSleep 550 1850 0 # Battle
-    waitBattleStart
-    doAuto
-    doSpeed
-    waitBattleFinish 2
-    # Check if win or lose battle
-    if [ "$battleFailed" = false ]; then # Win
-        printInColor INFO "${cGreen}WIN${cNc}"
-        if [ "$1" = "KT" ]; then                    # King's Tower
-            inputTapSleep 550 1850 4                # Collect
-            inputTapSleep 550 75                    # Tap on the top to close possible limited offer
-            inputTapSleep 540 1350                  # Challenge
-        elif [ "$1" = "Campaign" ]; then            # Campaign
-            if testColorOR 550 1670 e2dddc; then    # Check for next stage
-                inputTapSleep 550 1670 15           # Next Stage
-                inputTapSleep 550 75                # Limited Offers
-                if testColorOR 550 740 f0daad; then # Check if boss
-                    inputTapSleep 550 1450 8
-                fi
-            else
-                inputTapSleep 550 1670 3 # Continue to next battle
-                inputTapSleep 550 75     # Limited Offers
-            fi
-        fi
-        _battle_WIN=$((_battle_WIN + 1)) # Increment
-        _total_WIN=$((_total_WIN + 1))   # Increment
-    else                                 # Loss
-        printInColor INFO "${cRed}Loss${cNc}"
-        if [ "$1" = "KT" ]; then         # King's Tower
-            inputTapSleep 550 1720       # Try again
-        elif [ "$1" = "Campaign" ]; then # Campaign
-            inputTapSleep 550 1670 3     # Continue to next battle
-        fi
-        if [ "$2" = "Own" ]; then
-            _own_battle_COUNT=$((_own_battle_COUNT + 1)) # Increment
-        elif [ "$2" = "Popular" ]; then
-            _popular_battle_COUNT=$((_popular_battle_COUNT + 1)) # Increment
-        fi
-        _total_LOSS=$((_total_LOSS + 1)) # Increment
-    fi
-    # if not at battle screen reset game.
-    if testColorNAND 635 1350 eacc96; then
-        printInColor "ERROR" "Not at Battle Screen. Resetting Game."
-        init
-        run
-    fi
-
-    logDebug "push" 4 "EXIT"
-}
-
-# ##############################################################################
-# Function Name : chooseFormation
-# Descripton    : Chooses a formation
-# Args          : <TYPE> <FORMATION>
-#                   <TYPE>: Own / Popular
-#                   <FORMATION>: 1,2,3,4,5,6
-# ##############################################################################
-chooseFormation() {
-    logDebug "chooseFormation" 4 "ENTER"
-
-    printInColor INFO "Choosing $1 Formation $2"
-
-    case "$1" in
-    "Own")
-        inputTapSleep 80 1100 # Own Formations
-        case "$2" in
-        "1") inputTapSleep 900 1300 ;; # First Formation
-        "2") inputTapSleep 900 1500 ;; # Second Formation
-        *)
-            printInColor ERROR "Invalid formation number for Own type: $2"
-            logDebug "chooseFormation" 4 "EXIT"
-            return 1
-            ;;
-        esac
-        ;;
-    "Popular")
-        inputTapSleep 970 1820 1 # Formations
-        inputTapSleep 800 1600 1 # Popular
-        case "$2" in
-        "1") inputTapSleep 850 600 1 ;;  # 1st Formation
-        "2") inputTapSleep 850 775 1 ;;  # 2nd Formation
-        "3") inputTapSleep 850 950 1 ;;  # 3rd Formation
-        "4") inputTapSleep 850 1130 1 ;; # 4th Formation
-        "5") inputTapSleep 850 1300 1 ;; # 5th Formation
-        "6") inputTapSleep 850 1480 1 ;; # 6th Formation
-        *)
-            printInColor ERROR "Invalid formation number for Popular type: $2"
-            logDebug "chooseFormation" 4 "EXIT"
-            return 1
-            ;;
-        esac
-        inputTapSleep 730 1800 1 # Use Formation
-        inputTapSleep 700 1240 1 # Confirm
-        ;;
-    *)
-        printInColor ERROR "Invalid formation type: $1"
-        logDebug "chooseFormation" 4 "EXIT"
-        return 0
-        ;;
-    esac
-
-    logDebug "chooseFormation" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1519,14 +1324,14 @@ soloBounties() {
     if testColorOR -d "$DEFAULT_DELTA" -f 337 1550 ffffff; then
         # Check once before scrolling down
         dispatchBounties 1
-        inputSwipe 550 1400 550 400 500 # Scroll Down
+        inputSwipe 550 1400 550 400 300 # Scroll Down
         sleep 1
         until $finished; do
             dispatchBounties 2
             if [ "$_gold" -gt "$maxGold" ]; then
                 inputTapSleep 140 300 1         # Refresh
                 inputTapSleep 700 1260 1        # Confirm
-                inputSwipe 550 1400 550 400 500 # Scroll Down
+                inputSwipe 550 1400 550 400 300 # Scroll Down
             else
                 finished=true
             fi
@@ -1694,7 +1499,7 @@ fountainOfTime() {
     inputTapSleep 550 75                # Tap Away Rewards
     if testColorOR 550 300 debd62; then # Level Up
         inputTapSleep 550 75            # Tap top of the screen to close pop-up
-        printInColor INFO "Level Up!"
+        printInColor INFO "Fountain of Time Level Up!"
         if testColorNAND 550 200 1f2438; then # "Newly Unlocked Beacons"
             inputTapSleep 550 75              # Tap top of the screen to close pop-up
         fi
@@ -1703,111 +1508,6 @@ fountainOfTime() {
     verifyHEX 240 1775 b17848 "Collected Fountain of Time." "Failed to collect Fountain of Time."
 
     logDebug "fountainOfTime" 4 "EXIT"
-}
-
-# ##############################################################################
-# Function Name : pushKingsTower
-# Descripton    : Pushes campaign using popular formations
-# Remark        : Loops until you manually exit script.
-# ##############################################################################
-pushKingsTower() {
-    logDebug "pushKingsTower" 4 "ENTER"
-
-    if $doUsePopularFormations; then
-        _popularFormation=1
-    fi
-    if $doUseOwnFormations; then
-        _ownFormation=1
-    fi
-    _total_LOSS=0
-    _total_WIN=0
-    inputTapSleep 550 850 5 # King's Tower
-
-    if [ "$doMainTower" = true ]; then
-        inputTapSleep 550 800 # Main Tower
-    fi
-
-    if [ "$doTowerOfLight" = true ] && { [ "$dayofweek" -eq 1 ] || [ "$dayofweek" -eq 5 ] || [ "$dayofweek" -eq 7 ]; }; then
-        inputTapSleep 300 950 # Tower of Light
-    fi
-
-    if [ "$doTheBrutalCitadel" = true ] && { [ "$dayofweek" -eq 2 ] || [ "$dayofweek" -eq 5 ] || [ "$dayofweek" -eq 7 ]; }; then
-        inputTapSleep 400 1250 # The Brutal Citadel
-    fi
-
-    if [ "$doTheWorldTree" = true ] && { [ "$dayofweek" -eq 3 ] || [ "$dayofweek" -eq 6 ] || [ "$dayofweek" -eq 7 ]; }; then
-        inputTapSleep 750 660 # The World Tree
-    fi
-
-    if [ "$doCelestialSanctum" = true ] && { [ "$dayofweek" -eq 3 ] || [ "$dayofweek" -eq 5 ] || [ "$dayofweek" -eq 7 ]; }; then
-        inputTapSleep 270 500 # Celestial Sanctum
-    fi
-
-    if [ "$doTheForsakenNecropolis" = true ] && { [ "$dayofweek" -eq 4 ] || [ "$dayofweek" -eq 6 ] || [ "$dayofweek" -eq 7 ]; }; then
-        inputTapSleep 780 1100 # The Forsaken Necropolis
-    fi
-
-    if [ "$doInfernalFortress" = true ] && { [ "$dayofweek" -eq 4 ] || [ "$dayofweek" -eq 6 ] || [ "$dayofweek" -eq 7 ]; }; then
-        inputTapSleep 620 1550 # Infernal Fortress
-    fi
-
-    inputTapSleep 540 1350 3 # Challenge
-
-    while true; do
-        _own_battle_COUNT=0     # Loss Counter for Own Formations
-        _popular_battle_COUNT=0 # Loss Counter for Popular Formations
-        _battle_WIN=0
-
-        if $doUseOwnFormations; then
-            # Cycle through Own Formations until "totalOwnFormations" or a win
-            until [ "$_ownFormation" -gt "$totalOwnFormations" ] || [ "$_battle_WIN" -ge 1 ]; do
-                if $doUseOwnFormations; then
-                    chooseFormation "Own" "$_ownFormation"
-                fi
-                # Try each formation until "maxFormationTries" or a win
-                until [ "$_own_battle_COUNT" -ge "$maxFormationTries" ] || [ "$_battle_WIN" -ge 1 ]; do
-                    push "KT" "Own"
-                done
-                _ownFormation=$((_ownFormation + 1)) # Increment formation
-                _own_battle_COUNT=0                  # Reset loss counter
-            done
-        fi
-
-        if $doUsePopularFormations; then
-            # Cycle through Popular Formations until "totalPopularFormations" or a win
-            until [ "$_popularFormation" -gt "$totalPopularFormations" ] || [ "$_battle_WIN" -ge 1 ]; do
-                if $doUsePopularFormations; then
-                    chooseFormation "Popular" "$_popularFormation"
-                fi
-                # Try each formation until "maxFormationTries" or a win
-                until [ "$_popular_battle_COUNT" -ge "$maxFormationTries" ] || [ "$_battle_WIN" -ge 1 ]; do
-                    push "KT" "Popular"
-                done
-                _popularFormation=$((_popularFormation + 1)) # Increment formation
-                _popular_battle_COUNT=0                      # Reset counter back to zero
-            done
-        fi
-
-        if [ "$doUseOwnFormations" = "false" ] && [ "$doUsePopularFormations" = "false" ]; then
-            count=0
-            while [ "$count" -le 5 ]; do # Battle 5 times
-                push "KT"
-                count=$((count + 1))
-            done
-        fi
-
-        # Reset Formations back to one
-        if $doUsePopularFormations; then
-            _popularFormation=1
-        fi
-        if $doUseOwnFormations; then
-            _ownFormation=1
-        fi
-
-        printInColor INFO "${cGreen}$_total_WIN Wins${cNc} / ${cRed}$_total_LOSS Losses${cNcS}"
-    done
-
-    logDebug "pushKingsTower" 4 "EXIT"
 }
 
 # ##############################################################################
@@ -1823,9 +1523,9 @@ buyFromStore() {
 
     _store_purchase_COUNT=0
 
-    inputSwipe 550 1400 550 400 100 # Scroll Down
+    inputSwipe 550 1400 550 400 300 # Scroll Down
     sleep 2
-    inputTapSleep 440 900 3         # Store
+    inputTapSleep 440 900 3 # Store
 
     # if [ "$buyStoreDust" = true ]; then # Dust
     #     buyFromStore_buyItem 175 1100
@@ -2029,7 +1729,7 @@ buyFromStore_test() {
 guildHunts() {
     logDebug "guildHunts" 4 "ENTER"
 
-    inputSwipe 550 400 550 1400 500 # Scroll Up
+    inputSwipe 550 400 550 1400 300 # Scroll Up
     sleep 1
     # Open Guild
     inputTapSleep 480 1050 6
@@ -2138,7 +1838,7 @@ nobleTavern() {
 oakInn() {
     logDebug "oakInn" 4 "ENTER"
 
-    inputSwipe 550 400 550 1400 500 # Scroll Up
+    inputSwipe 550 400 550 1400 300 # Scroll Up
     inputTapSleep 550 500 5         # Oak Inn
     printInColor "INFO" "Searching for presents to collect..."
 
@@ -2179,7 +1879,7 @@ oakInn() {
 strengthenCrystal() {
     logDebug "strengthenCrystal" 4 "ENTER"
 
-    inputSwipe 550 400 550 1400 500 # Scroll Up
+    inputSwipe 550 400 550 1400 300 # Scroll Up
     sleep 1
     if testColorOR -d "$DEFAULT_DELTA" 835 1730 fa6645; then # If red circle
         inputTapSleep 700 1700 3                             # Resonating Crystal
@@ -2189,7 +1889,7 @@ strengthenCrystal() {
 
         inputTapSleep 550 1850                                                    # Strenghen Crystal
         if testColorOR 700 1250 9aedc4 && [ "$allowCrystalLevelUp" = true ]; then # If Level up
-            printInColor "INFO" "Level up."
+            printInColor "INFO" "Resonating Crystal Level up."
             inputTapSleep 700 1250 3 # Confirm level up window
             inputTapSleep 200 1850 1 # Close level up window
             inputTapSleep 200 1850   # Close gift window
@@ -2213,15 +1913,17 @@ strengthenCrystal() {
 templeOfAscension() {
     logDebug "templeOfAscension" 4 "ENTER"
 
-    inputSwipe 550 400 550 1400 500 # Scroll Up
+    inputSwipe 550 400 550 1400 300 # Scroll Up
     sleep 1
-    if testColorOR -d "$DEFAULT_DELTA" 420 1510 fe563b; then # If red circle
-        inputTapSleep 280 1450                               # Temple Of Ascension
-        inputTapSleep 900 1800                               # Auto Ascend
-        inputTapSleep 550 1460                               # Confirm
-        inputTapSleep 550 1810                               # Close
-        inputTapSleep 70 1810                                # Exit
-
+    if testColorOR -d "$DEFAULT_DELTA" 605 1124 ef5b3a; then        # If red circle
+        inputTapSleep 300 1450 3                                    # Temple Of Ascension
+        until testColorNAND -d "$DEFAULT_DELTA" 925 1840 bd9665; do # Auto Ascend button
+            inputTapSleep 900 1800                                  # Auto Ascend
+            inputTapSleep 550 1460                                  # Confirm
+            inputTapSleep 550 1810                                  # Close
+            sleep 2
+        done
+        inputTapSleep 70 1810 # Exit
         inputTapSleep 70 1810 # Exit
         wait
         verifyHEX 20 1775 af7747 "Attempted to ascend heroes." "Failed to ascend heroes."
@@ -2241,7 +1943,7 @@ twistedRealmBoss() {
     logDebug "twistedRealmBoss ${cPurple}$*${cNc}" 4 "ENTER"
 
     if [ "$1" = true ]; then            # Check if starting from tab or already inside activity
-        inputSwipe 550 400 550 1400 500 # Scroll Up
+        inputSwipe 550 400 550 1400 300 # Scroll Up
         inputTapSleep 480 1050 6        # Guild
     fi
     ## For testing only! Keep as comment ##
@@ -2300,12 +2002,12 @@ checkWhereToEnd() {
     case "$endAt" in
     "oak")
         switchTab "Ranhorn" true
-        inputSwipe 550 400 550 1400 500 # Scroll Up
+        inputSwipe 550 400 550 1400 300 # Scroll Up
         inputTapSleep 550 500 5         # Oak Inn
         ;;
     "soren")
         switchTab "Ranhorn" true
-        inputSwipe 550 400 550 1400 500 # Scroll Up
+        inputSwipe 550 400 550 1400 300 # Scroll Up
         inputTapSleep 480 1050 6        # Guild
         inputTapSleep 290 860 3         # Guild Hunting
         inputTapSleep 970 890 0         # Soren
@@ -2318,7 +2020,7 @@ checkWhereToEnd() {
         ;;
     "tavern")
         switchTab "Ranhorn" true
-        inputSwipe 550 1400 550 400 500 # Scroll Down
+        inputSwipe 550 1400 550 400 300 # Scroll Down
         inputTapSleep 200 600 0
         ;;
     "merchants")
@@ -2451,14 +2153,14 @@ collectMerchants() {
     # WARN: Breaks if a pop-up message shows up
 
     # Check for Monthly Card
-    if testColorOR -d "$DEFAULT_DELTA" 342 849 cd0000; then # Red exclamation mark
+    if testColorOR -d "$DEFAULT_DELTA" 342 849 ea452c; then # Red exclamation mark
         inputTapSleep 270 950                               # Monthly Card Chest
         inputTapSleep 550 300                               # Collect rewards
         sleep 2
     fi
 
     # Check for Deluxe Monthly Card
-    if testColorOR -d "$DEFAULT_DELTA" 895 849 d10000; then # Red exclamation mark
+    if testColorOR -d "$DEFAULT_DELTA" 895 849 f14c33; then # Red exclamation mark
         inputTapSleep 820 950                               # Deluxe Monthly Card Chest
         inputTapSleep 550 300                               # Collect rewards
         sleep 2
@@ -2479,7 +2181,7 @@ collectMerchants() {
         if testColorOR -d "$DEFAULT_DELTA" 365 515 d20101; then
             inputTapSleep 210 720 # Free
             inputTapSleep 550 300 # Collect rewards
-        elif testColorOR -d "$DEFAULT_DELTA" 365 1000 cc0101; then
+        elif testColorOR -d "$DEFAULT_DELTA" 365 1000 e54830; then
             inputTapSleep 210 1200 # Free
             inputTapSleep 550 300  # Collect rewards
         else
@@ -2495,7 +2197,7 @@ collectMerchants() {
         if testColorOR -d "$DEFAULT_DELTA" 365 515 d20101; then
             inputTapSleep 210 720 # Free
             inputTapSleep 550 300 # Collect rewards
-        elif testColorOR -d "$DEFAULT_DELTA" 365 1475 d70000; then
+        elif testColorOR -d "$DEFAULT_DELTA" 365 1475 f14f36; then
             inputTapSleep 210 1480 # Free
             inputTapSleep 550 300  # Collect rewards
         else
@@ -2645,7 +2347,6 @@ run() {
     if checkToDo doFastRewards; then fastRewards; fi
     if checkToDo doCollectFriendsAndMercenaries; then collectFriendsAndMercenaries; fi
     if checkToDo doLootAfkChest2; then lootAfkChest; fi
-    if checkToDo doPushCampaign; then pushCampaign; fi
 
     # DARK FOREST TAB
     switchTab "Dark Forest"
@@ -2659,7 +2360,6 @@ run() {
     elif checkToDo doLegendsTournament; then legendsTournament true; fi
     if checkToDo doKingsTower; then kingsTower; fi
     if checkToDo doFountainOfTime; then fountainOfTime; fi
-    if checkToDo doPushKingsTower; then pushKingsTower; fi
 
     # RANHORN TAB
     switchTab "Ranhorn"

@@ -157,15 +157,6 @@ doCelestialSanctum=${doCelestialSanctum:-"true"}\n\
 doTheForsakenNecropolis=${doTheForsakenNecropolis:-"true"}\n\
 doInfernalFortress=${doInfernalFortress:-"true"}\n\
 \n\
-# Pushing Campaign and King's Tower\n\
-doPushCampaign=${doPushCampaign:-"false"}\n\
-doPushKingsTower=${doPushKingsTower:-"false"}\n\
-doUsePopularFormations=${doUsePopularFormations:-"false"}\n\
-doUseOwnFormations=${doUseOwnFormations:-"false"}\n\
-maxFormationTries=${maxFormationTries:-"3"}\n\
-totalPopularFormations=${totalPopularFormations:-"5"}\n\
-totalOwnFormations=${totalOwnFormations:-"1"}\n\
-\n\
 # --- Actions --- #\n\
 # Campaign\n\
 doLootAfkChest=${doLootAfkChest:-"true"}\n\
