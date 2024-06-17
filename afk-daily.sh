@@ -29,7 +29,7 @@ DEFAULT_DELTA=3 # Default delta for colors
 DEFAULT_SLEEP=2 # equivalent to wait (default 2)
 
 # Event flags
-eventHoe=true           # Set to `true` if "Heroes of Esperia" event is live
+eventHoe=false          # Set to `true` if "Heroes of Esperia" event is live
 eventTs=true            # Set to `true` if "Treasure Scramble" event is live
 eventTv=false           # Set to `true` if "Treasure Vanguard" event is live
 bountifulBounties=false # Set to `true` if "Bountiful Bounties" event is live
@@ -262,6 +262,8 @@ inputSwipe() {
     logDebug "inputSwipe ${cPurple}$*${cNc}" 3 "ENTER"
 
     input touchscreen swipe "$1" "$2" "$3" "$4" "$5"
+    sleep 2
+
     screenshotRequired=true
 
     logDebug "inputSwipe" 3 "EXIT"
@@ -1324,14 +1326,13 @@ soloBounties() {
     if testColorOR -d "$DEFAULT_DELTA" -f 337 1550 ffffff; then
         # Check once before scrolling down
         dispatchBounties 1
-        inputSwipe 550 1400 550 400 300 # Scroll Down
-        sleep 1
+        inputSwipe 300 1700 550 400 300 # Scroll Down
         until $finished; do
             dispatchBounties 2
             if [ "$_gold" -gt "$maxGold" ]; then
                 inputTapSleep 140 300 1         # Refresh
                 inputTapSleep 700 1260 1        # Confirm
-                inputSwipe 550 1400 550 400 300 # Scroll Down
+                inputSwipe 300 1700 550 400 300 # Scroll Down
             else
                 finished=true
             fi
@@ -1523,9 +1524,8 @@ buyFromStore() {
 
     _store_purchase_COUNT=0
 
-    inputSwipe 550 1400 550 400 300 # Scroll Down
-    sleep 2
-    inputTapSleep 440 900 3 # Store
+    inputSwipe 300 1700 550 100 300 # Scroll Down
+    inputTapSleep 440 900 3         # Store
 
     # if [ "$buyStoreDust" = true ]; then # Dust
     #     buyFromStore_buyItem 175 1100
@@ -1603,7 +1603,6 @@ buyFromStore() {
     #     if [ "$buyWeeklyLabyrinth" = true ]; then
     #         inputTapSleep 1020 1810          # Labyrinth Store
     #         inputSwipe 1050 1600 1050 750 50 # Swipe all the way down
-    #         wait
     #         if testColorOR -d "$DEFAULT_DELTA" 180 1350 0c8bbd; then # row 5, item 1 > 120 Rare Hero Soulstone / 4800 Labyrinth Tokens
     #             buyFromStore_buyItem 180 1350
     #         elif testColorOR -d "$DEFAULT_DELTA" 420 1350 2a99cc; then # row 5, item 2 > 120 Rare Hero Soulstone / 4800 Labyrinth Tokens
@@ -1696,9 +1695,8 @@ buyFromStore_test() {
             fi
         fi
         if [ "$buyWeeklyLabyrinth" = true ]; then
-            inputTapSleep 1020 1810          # Labyrinth Store
-            inputSwipe 1050 1600 1050 750 50 # Swipe all the way down
-            wait
+            inputTapSleep 1020 1810                                  # Labyrinth Store
+            inputSwipe 1050 1600 1050 750 50                         # Swipe all the way down
             if testColorOR -d "$DEFAULT_DELTA" 180 1350 0c8bbd; then # row 5, item 1 > 120 Rare Hero Soulstone / 4800 Labyrinth Tokens
                 buyFromStore_buyItem 180 1350
             elif testColorOR -d "$DEFAULT_DELTA" 420 1350 2a99cc; then # row 5, item 2 > 120 Rare Hero Soulstone / 4800 Labyrinth Tokens
@@ -1733,8 +1731,7 @@ buyFromStore_test() {
 guildHunts() {
     logDebug "guildHunts" 4 "ENTER"
 
-    inputSwipe 550 400 550 1400 300 # Scroll Up
-    sleep 1
+    inputSwipe 300 100 550 1700 300 # Scroll Up
     # Open Guild
     inputTapSleep 480 1050 6
 
@@ -1842,30 +1839,33 @@ nobleTavern() {
 oakInn() {
     logDebug "oakInn" 4 "ENTER"
 
-    inputSwipe 550 400 550 1400 300 # Scroll Up
+    _oakInn_TRIES=0
+    _oakInn_TRIES_MAX=10
+    oakInn_collectedPresents=false
+
+    inputSwipe 300 100 550 1700 300 # Scroll Up
     inputTapSleep 550 500 5         # Oak Inn
     printInColor "INFO" "Searching for presents to collect..."
 
-    _oakInn_TRIES=0
-    _oakInn_TRIES_MAX=10
+    inputSwipe 950 1700 950 100 300 # Swipe to the Bottom
+    inputSwipe 950 1700 950 100 300 # Swipe to the Bottom
 
-    inputSwipe 950 1700 950 100 300 # Swipe to the bottoms
-    sleep 2
     until [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; do
         inputTapSleep 240 1185 # Click Present
-        # Check if tapped on present
-        if testColorOR 955 1235 eadcb6; then
-            inputTapSleep 550 1650 # Collect Reward
-            inputTapSleep 540 1650 # Tap Reward Screen
+        if testColorOR 955 1235 eadcb6; then # Check if tapped on present
+            inputTapSleep 550 1650           # Collect Reward
+            inputTapSleep 540 1650           # Tap Reward Screen
             printInColor "INFO" "Collected presents at the Oak Inn."
+            oakInn_collectedPresents=true
             break
-        fi
-        # If no present collected, warn user
-        if [ "$_oakInn_TRIES" -ge "$_oakInn_TRIES_MAX" ]; then
-            printInColor "WARN" "No presents collected at the Oak Inn."
         fi
         _oakInn_TRIES=$((_oakInn_TRIES + 1)) # Increment
     done
+
+    # If no present collected, warn user
+    if [ "$oakInn_collectedPresents" = 'false' ]; then
+        printInColor "WARN" "No presents collected at the Oak Inn."
+    fi
 
     inputTapSleep 70 1810 3 # Return
 
@@ -1883,8 +1883,7 @@ oakInn() {
 strengthenCrystal() {
     logDebug "strengthenCrystal" 4 "ENTER"
 
-    inputSwipe 550 400 550 1400 300 # Scroll Up
-    sleep 1
+    inputSwipe 300 100 550 1700 300                          # Scroll Up
     if testColorOR -d "$DEFAULT_DELTA" 835 1730 fa6645; then # If red circle
         inputTapSleep 700 1700 3                             # Resonating Crystal
 
@@ -1917,8 +1916,7 @@ strengthenCrystal() {
 templeOfAscension() {
     logDebug "templeOfAscension" 4 "ENTER"
 
-    inputSwipe 550 400 550 1400 300 # Scroll Up
-    sleep 1
+    inputSwipe 300 100 550 1700 300                                 # Scroll Up
     if testColorOR -d "$DEFAULT_DELTA" 605 1124 ef5b3a; then        # If red circle
         inputTapSleep 300 1450 3                                    # Temple Of Ascension
         until testColorNAND -d "$DEFAULT_DELTA" 925 1840 bd9665; do # Auto Ascend button
@@ -1947,7 +1945,7 @@ twistedRealmBoss() {
     logDebug "twistedRealmBoss ${cPurple}$*${cNc}" 4 "ENTER"
 
     if [ "$1" = true ]; then            # Check if starting from tab or already inside activity
-        inputSwipe 550 400 550 1400 300 # Scroll Up
+        inputSwipe 300 100 550 1700 300 # Scroll Up
         inputTapSleep 480 1050 6        # Guild
     fi
     ## For testing only! Keep as comment ##
@@ -2006,12 +2004,12 @@ checkWhereToEnd() {
     case "$endAt" in
     "oak")
         switchTab "Ranhorn" true
-        inputSwipe 550 400 550 1400 300 # Scroll Up
+        inputSwipe 300 100 550 1700 300 # Scroll Up
         inputTapSleep 550 500 5         # Oak Inn
         ;;
     "soren")
         switchTab "Ranhorn" true
-        inputSwipe 550 400 550 1400 300 # Scroll Up
+        inputSwipe 300 100 550 1700 300 # Scroll Up
         inputTapSleep 480 1050 6        # Guild
         inputTapSleep 290 860 3         # Guild Hunting
         inputTapSleep 970 890 0         # Soren
@@ -2024,7 +2022,7 @@ checkWhereToEnd() {
         ;;
     "tavern")
         switchTab "Ranhorn" true
-        inputSwipe 550 1400 550 400 300 # Scroll Down
+        inputSwipe 300 1700 550 400 300 # Scroll Down
         inputTapSleep 200 600 0
         ;;
     "merchants")
@@ -2042,8 +2040,7 @@ checkWhereToEnd() {
             inputTapSleep 550 1680 0 # Championship
         else
             inputSwipe 550 1600 550 500 2 # Swipe up to see Championship
-            sleep 1
-            inputTapSleep 550 1700 0 # Legend's Challenger Tournament
+            inputTapSleep 550 1700 0      # Legend's Challenger Tournament
         fi
         ;;
     "closeApp")
